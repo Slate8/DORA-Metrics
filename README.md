@@ -5,7 +5,7 @@ Dieses Repository beherbergt eine Webanwendung, die im Rahmen meiner Bachelorarb
 ## Technologiestack
 
 - Die Webanwendung wird in Python entwickelt.
-- Als Web-Framework verwenden wir Flask, aufgrund seiner Einfachheit und Flexibilität.
+- Als Web-Framework kommt das Flask-Framework aufgrund seiner Einfachheit und Flexibilität zum Einsatz.
 
 ## Bachelorarbeit
 
@@ -19,6 +19,6 @@ Die Hauptaufgabe dieser Webanwendung besteht darin, CI/CD-Metriken zu sammeln un
 
 Für Anweisungen zur Installation und Verwendung dieser Webanwendung, siehe die [Dokumentation](/docs/).
 
-## Lizenz
-
-Dieses Projekt ist unter der MIT-Lizenz lizenziert. Weitere Informationen finden Sie in der [Lizenzdatei](/LICENSE).
+## Ersteller
+Tobias Trentzsch für den Studiengang Medieninformatik (online)
+Betreuer Prof. Dr. Stefan Edlich
