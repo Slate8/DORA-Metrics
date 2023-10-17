@@ -6,33 +6,91 @@
     <title>Document</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-</head>
+    <title>Metriken-Übersicht</title>
+    
+  </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#">Navbar</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Features</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Pricing</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
 
-      <div class="container"></div>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">DORA-METRICS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="nav nav-tabs" id="metricTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#codeChangeVolume">Code Change Volume</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#mttr">Mean Time to Recover (MTTR)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#changeFailureRate">Change Failure Rate</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#deployment">Deployment</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="tab-content">
+    <div class="tab-pane active" id="codeChangeVolume">
+        <!-- Hier den Inhalt für Code Change Volume einfügen -->
+        <h1>"CCV ist Aktiv"</h1>
+        <p>Hier kannst du eine Zahl eingeben und an die Datenbank senden:</p>
+        <form method="POST" action="/submit_ccv">
+            <div class="form-group">
+                <label for="ccvInput">Code Change Volume:</label>
+                <div class="col-md-6">
+                <input type="number" class="form-control" id="ccvInput" name="ccvValue">
+            </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Absenden</button>
+        </form>
+    <div>
+        <div>
+            <h2>Code Change Volume Metrics</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Code Change Volume</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for metric in ccv_data %}
+                        <tr>
+                            <td class="text-center">{{ metric.timestamp.strftime('%H:%M %d.%m.%Y') }}</td>
+                            <td class="text-center">{{ metric.code_change_volume }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+
+    </div>
+
+    </div>
+    <div class="tab-pane" id="mttr">
+        <!-- Hier den Inhalt für MTTR einfügen -->
+        <h1>"MTTR ist Aktiv"</h1>
+    </div>
+    <div class="tab-pane" id="changeFailureRate">
+        <!-- Hier den Inhalt für Change Failure Rate einfügen -->
+    </div>
+    <div class="tab-pane" id="deployment">
+        <!-- Hier den Inhalt für Deployment einfügen -->
+    </div>
+</div>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> 
+
+      
 </body>
 </html>
