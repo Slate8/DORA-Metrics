@@ -17,4 +17,4 @@ def add_user(username, password):
         db.session.commit()
 
 if __name__ == "__main__":
-    add_user("Tobi", "123")
+    add_user("Paul", "123")
