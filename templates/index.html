@@ -52,10 +52,26 @@
         <div class="tab-pane active" id="codeChangeVolume">
             <!-- Hier den Inhalt für Code Change Volume einfügen -->
 
-            <p>Hier kannst du Anzahl der geschriebenen Codezeilen eingeben und an die Datenbank senden:</p>
+            </select>
+
+
+
             <form method="POST" action="/submit_ccv">
+                <p>Bitte wähle ein Projekt aus:</p>
+                
+                <select id="projectSelector" name="project_id">
+                    <option value="all">Alle Projekte</option>
+                    {% for project in projects %}
+                    <option value="{{ project.id }}">{{ project.name }}</option>
+
+                    {% endfor %}
+                </select>
+                 <!-- Button to fetch CCV -->
+            <button type="button" id="fetchCCV">CCV abrufen</button>
+                
                 <div class="form-group">
                     <label for="ccvInput">Code Change Volume:</label>
+                    <p>Hier kannst du Anzahl der geschriebenen Codezeilen eingeben und an die Datenbank senden:</p>
                     <div class="col-md-6">
                         <input type="number" class="form-control mt-2" id="ccvInput" name="ccvValue">
                     </div>
@@ -66,12 +82,13 @@
                 <div class="col-md-6">
                     <div>
                         <h2>Code Change Volume Metrics</h2>
-                        <table>
+                        <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Timestamp</th>
-                                    <th>Code Change Volume</th>
-                                    <th>User</th>
+                                    <th class="text-center">Timestamp</th>
+                                    <th class="text-center">Code Change Volume</th>
+                                    <th class="text-center">User</th>
+                                    <th class="text-center">Projekt</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -80,6 +97,7 @@
                                     <td class="text-center">{{ metric.timestamp.strftime('%H:%M %d.%m.%Y') }}</td>
                                     <td class="text-center">{{ metric.code_change_volume }}</td>
                                     <td class="text-center">{{ metric.user.username }}</td>
+                                    <td class="text-center">{{ metric.projekt.name }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -100,156 +118,67 @@
                 <canvas id="myPieChart" style="width:100%;max-width:600px"></canvas>
             </div>
 
-            <script>
-                const tableRows = document.querySelectorAll('tbody tr');
-                const groupedData = {};
-
-                tableRows.forEach(row => {
-                    const cells = row.querySelectorAll('td.text-center');
-                    const timestamp = cells[0].textContent;
-                    const codeLine = parseFloat(cells[1].textContent);
-                    // const userId = parseFloat(cells[2].textContent);
-                    const username = cells[2].textContent;
-
-                    if (!groupedData[username]) {
-                        groupedData[username] = {
-                            timestamps: [],
-                            codeLines: []
-                        };
-                    }
-
-                    groupedData[username].timestamps.push(timestamp);
-                    groupedData[username].codeLines.push(codeLine);
-                });
-
-
-                const allUniqueTimestamps = [...new Set([...tableRows].map(row => row.querySelector('td.text-center').textContent))]
-                    .map(timestamp => {
-                        const [time, date] = timestamp.split(' ');
-                        const [hour, minute] = time.split(':');
-                        const [day, month, year] = date.split('.').map(num => parseInt(num, 10));
-                        return new Date(year, month - 1, day, hour, minute); // Monat ist 0-basiert in JavaScript
-                    })
-                    .sort((a, b) => a - b) // sortiert die Date-Objekte
-                    .map(date => {
-                        const day = date.getDate().toString().padStart(2, '0');
-                        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // +1, da Monate 0-basiert sind
-                        const year = date.getFullYear();
-                        const hour = date.getHours().toString().padStart(2, '0');
-                        const minute = date.getMinutes().toString().padStart(2, '0');
-                        return `${hour}:${minute} ${day}.${month}.${year}`; // konvertiert zurück zum ursprünglichen Format
-                    });
-
-
-
-                function getRandomColor() {
-                    let letters = '0123456789ABCDEF';
-                    let color = '#';
-                    for (let i = 0; i < 6; i++) {
-                        color += letters[Math.floor(Math.random() * 16)];
-                    }
-                    return color;
-                }
-
-                const datasets = [];
-
-
-                for (let username in groupedData) {
-                    let data = [];
-
-                    allUniqueTimestamps.forEach((time) => {
-                        let index = groupedData[username].timestamps.indexOf(time);
-                        data.push(index !== -1 ? groupedData[username].codeLines[index] : undefined);
-                    });
-
-
-                    let color = getRandomColor();
-                    datasets.push({
-                        label: `Username: ${username}`,
-                        data: data,
-                        fill: false,
-                        lineTension: 0,
-                        backgroundColor: color,
-                        borderColor: color,
-                        borderWidth: 2,
-                        spanGaps: true,
-                    });
-                    console.log(datasets);
-                }
-
-                new Chart("myChart", {
-                    type: "line",
-                    data: {
-                        labels: allUniqueTimestamps,
-                        datasets: datasets
-                    },
-
-                });
-
-                const userCodeLines = {};
-
-                tableRows.forEach(row => {
-                    const cells = row.querySelectorAll('td.text-center');
-                    const codeLine = parseFloat(cells[1].textContent);
-                    const username = cells[2].textContent;
-
-                    if (!userCodeLines[username]) {
-                        userCodeLines[username] = 0;
-                    }
-                    userCodeLines[username] += codeLine;
-                });
-
-                const usernames = Object.keys(userCodeLines);
-                const codeLineTotals = Object.values(userCodeLines);
-
-                const backgroundColors = usernames.map(() => getRandomColor());
-
-                new Chart("myPieChart", {
-                    type: 'pie',
-                    data: {
-                        labels: usernames.map(name => `${name}`),
-                        datasets: [{
-                            data: codeLineTotals,
-                            backgroundColor: backgroundColors
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        legend: {
-                            position: 'top',
-                        },
-                        animation: {
-                            animateScale: true,
-                            animateRotate: true
-                        }
-                    }
-                });
-
-
-            </script>
-
-
-
-
-
-
-
         </div>
 
 
         <div class="tab-pane" id="mttr">
             <!-- Hier den Inhalt für MTTR einfügen -->
-            <p>Hier kannst du MTTR eingeben und an die Datenbank senden:</p>
+             <p>Mean Time To Recover (MTTR): {{ mttr }}</p>
+            <!-- Dropdown for project selection -->
+            <select name="project_id" id="projectDropdown">
+                <option value="all">Alle Projekte</option>
+                {% for project in projects %}
+                <option value="{{ project.id }}">{{ project.name }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Button to fetch MTTR -->
+            <button id="fetchMTTR">MTTR abrufen</button>
+
+
+
+            <p>Hier kannst du die Details für einen Vorfall eingeben:</p>
             <form method="POST" action="/submit_mttr">
+                <!-- Startzeit des Vorfalls -->
                 <div class="form-group">
-                    <label for="mttrInput">Mean Time To Recover:</label>
-                    <div class="col-md-6">
-                        <input type="number" class="form-control" id="mttrInput" name="mttrValue">
-                    </div>
+                    <label for="start_timeInput">Startzeit des Vorfalls:</label>
+                    <input type="datetime-local" class="form-control" id="start_timeInput" name="start_time">
+                </div>
+                <!-- Endzeit des Vorfalls -->
+                <div class="form-group">
+                    <label for="end_timeInput">Endzeit des Vorfalls:</label>
+                    <input type="datetime-local" class="form-control" id="end_timeInput" name="end_time">
+                </div>
+                <!-- Beschreibung des Vorfalls -->
+                <div class="form-group">
+                    <label for="descriptionInput">Beschreibung:</label>
+                    <textarea class="form-control" id="descriptionInput" name="description" rows="3"></textarea>
+                </div>
+                <!-- Ursache des Vorfalls -->
+                <div class="form-group">
+                    <label for="causeInput">Ursache:</label>
+                    <textarea class="form-control" id="causeInput" name="cause" rows="3"></textarea>
+                </div>
+                <!-- Wie wurde das Problem behoben -->
+                <div class="form-group">
+                    <label for="resolutionInput">Behebung:</label>
+                    <textarea class="form-control" id="resolutionInput" name="resolution" rows="3"></textarea>
+                </div>
+                <!-- Auswahl des zugehörigen Projekts -->
+                <div class="form-group">
+                    <label for="projectSelect">Projekt:</label>
+                    <select class="form-control" id="projectSelect" name="project_id">
+                        <!-- Hier sollten die Projekt-Optionen aus der Datenbank geladen werden -->
+                        {% for project in projects %}
+                        <option value="{{ project.id }}">{{ project.name }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <button type="submit" class="btn btn-primary">Absenden</button>
             </form>
         </div>
+
+
         <div class="tab-pane" id="changeFailureRate">
             <!-- Hier den Inhalt für Change Failure Rate einfügen -->
         </div>
@@ -263,8 +192,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/static/js/main.js"></script>
-
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   
+    
+    
 
 </body>
 
