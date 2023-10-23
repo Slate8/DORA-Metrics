@@ -19,7 +19,7 @@
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">DORA-METRICS</a>
+            <a class="navbar-brand" href="/">DORA-METRICS</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -38,7 +38,21 @@
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="tab" href="#deployment">Deployment</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#leadTimeForChange">Lead Time for Changes</a>
+                    </li>
                 </ul>
+                <div class="navbar-text ml-auto mr-2">
+                    Bitte wähle ein Projekt aus:
+                </div>
+                <select id="projectSelector" name="project_id" class="custom-select mr-3">
+                    <option value="all" {% if current_project_id=='all' %}selected{% endif %}>Alle Projekte</option>
+                    {% for project in projects %}
+                    <option value="{{ project.id }}" {% if current_project_id==project.id|string %}selected{% endif %}>
+                        {{ project.name }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-primary mt-2" type="button" id="fetch_project_data">Daten abrufen</button>
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
                         <a class="nav-link btn btn-danger" href="/logout">Logout</a>
@@ -57,18 +71,7 @@
 
 
             <form method="POST" action="/submit_ccv">
-                <p>Bitte wähle ein Projekt aus:</p>
-                
-                <select id="projectSelector" name="project_id">
-                    <option value="all">Alle Projekte</option>
-                    {% for project in projects %}
-                    <option value="{{ project.id }}">{{ project.name }}</option>
 
-                    {% endfor %}
-                </select>
-                 <!-- Button to fetch CCV -->
-            <button type="button" id="fetchCCV">CCV abrufen</button>
-                
                 <div class="form-group">
                     <label for="ccvInput">Code Change Volume:</label>
                     <p>Hier kannst du Anzahl der geschriebenen Codezeilen eingeben und an die Datenbank senden:</p>
@@ -91,7 +94,7 @@
                                     <th class="text-center">Projekt</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="ccvDataBody">
                                 {% for metric in ccv_data %}
                                 <tr>
                                     <td class="text-center">{{ metric.timestamp.strftime('%H:%M %d.%m.%Y') }}</td>
@@ -123,17 +126,9 @@
 
         <div class="tab-pane" id="mttr">
             <!-- Hier den Inhalt für MTTR einfügen -->
-             <p>Mean Time To Recover (MTTR): {{ mttr }}</p>
-            <!-- Dropdown for project selection -->
-            <select name="project_id" id="projectDropdown">
-                <option value="all">Alle Projekte</option>
-                {% for project in projects %}
-                <option value="{{ project.id }}">{{ project.name }}</option>
-                {% endfor %}
-            </select>
 
-            <!-- Button to fetch MTTR -->
-            <button id="fetchMTTR">MTTR abrufen</button>
+
+            <p> Für das akuell ausgewählte Projekt die Mean Time To Recover (MTTR): {{ mttr }}</p>
 
 
 
@@ -179,12 +174,68 @@
         </div>
 
 
-        <div class="tab-pane" id="changeFailureRate">
-            <!-- Hier den Inhalt für Change Failure Rate einfügen -->
+        <div class="tab-pane" id="leadTimeForChange">
+            <h2>Lead Time for Changes Erfassung</h2>
+
+            <!-- Formular zum Erfassen von Commit- und Deployment-Daten -->
+            <form method="POST" action="/submit_ltc">
+                <!-- Commit Datum und Uhrzeit -->
+                <div class="form-group">
+                    <label for="commitDatetime">Commit Datum und Uhrzeit:</label>
+                    <input type="datetime-local" class="form-control" id="commitDatetime" name="commit_datetime">
+                </div>
+
+                <!-- Deployment Datum und Uhrzeit -->
+                <div class="form-group">
+                    <label for="deploymentDatetime">Deployment Datum und Uhrzeit:</label>
+                    <input type="datetime-local" class="form-control" id="deploymentDatetime"
+                        name="deployment_datetime">
+                </div>
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">Projekte</label>
+                    </div>
+                    <select id="projectSelector" name="project_id" class="custom-select">
+                        <option value="all">Alle Projekte</option>
+                        {% for project in projects %}
+                        <option value="{{ project.id }}">{{ project.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Lead Time berechnen und absenden</button>
+            </form>
+
+            <!-- Tabelle zur Anzeige der Lead Time for Changes Daten -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h2>Lead Time for Changes Metrics</h2>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Commit Datum</th>
+                                <th class="text-center">Deployment Datum</th>
+                                <th class="text-center">Lead Time</th>
+                                <!-- Andere notwendige Spalten können hier hinzugefügt werden -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Hier sollten die Daten aus der Datenbank geladen werden -->
+                            {% for ltc in ltc_data %}
+                            <tr>
+                                <td class="text-center">{{ ltc.commit_datetime.strftime('%H:%M %d.%m.%Y') }}</td>
+                                <td class="text-center">{{ ltc.deployment_datetime.strftime('%H:%M %d.%m.%Y') }}</td>
+                                <td class="text-center">{{ '%.2f'|format(ltc.value) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="tab-pane" id="deployment">
-            <!-- Hier den Inhalt für Deployment einfügen -->
-        </div>
+
+
     </div>
 
     <!-- Skripte -->
@@ -193,9 +244,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/static/js/main.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   
-    
-    
+
+
+
 
 </body>
 

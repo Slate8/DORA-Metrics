@@ -1,0 +1,55 @@
+Date : 2023-10-19 18:12:51
+Directory : /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics
+Total : 20 files,  814 codes, 177 comments, 260 blanks, all 1251 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Python     |         15 |        445 |        148 |        174 |        767 |
+| HTML       |          2 |        199 |         16 |         36 |        251 |
+| JavaScript |          1 |        118 |         13 |         26 |        157 |
+| Ini        |          1 |         38 |          0 |         13 |         51 |
+| Markdown   |          1 |         14 |          0 |         11 |         25 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                                                                     | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                                                                        |         20 |        814 |        177 |        260 |      1,251 |
+| . (Files)                                                                                                                                                                |          7 |        257 |         18 |         93 |        368 |
+| migrations                                                                                                                                                               |         10 |        240 |        130 |        105 |        475 |
+| migrations (Files)                                                                                                                                                       |          2 |         92 |         34 |         39 |        165 |
+| migrations/versions                                                                                                                                                      |          8 |        148 |         96 |         66 |        310 |
+| static                                                                                                                                                                   |          1 |        118 |         13 |         26 |        157 |
+| static/js                                                                                                                                                                |          1 |        118 |         13 |         26 |        157 |
+| templates                                                                                                                                                                |          2 |        199 |         16 |         36 |        251 |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                                                                                                 | language   | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/README.md                                                         | Markdown   |         14 |          0 |         11 |         25 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/add_metric.py                                                     | Python     |         38 |          2 |          9 |         49 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/add_project.py                                                    | Python     |         16 |          0 |          5 |         21 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/add_user.py                                                       | Python     |         16 |          0 |          5 |         21 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/db.py                                                             | Python     |          2 |          0 |          2 |          4 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/delete_db.py                                                      | Python     |         30 |          0 |          7 |         37 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/main.py                                                           | Python     |        141 |         16 |         54 |        211 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/alembic.ini                                            | Ini        |         38 |          0 |         13 |         51 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/env.py                                                 | Python     |         54 |         34 |         26 |        114 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/22a4b5ae535a_.py                              | Python     |         14 |         12 |          9 |         35 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/3011b84cd898_.py                              | Python     |         24 |         12 |          7 |         43 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/3a3b0e80b297_.py                              | Python     |         14 |         12 |          9 |         35 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/49810ee574e0_.py                              | Python     |         20 |         12 |          7 |         39 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/7135d8fabc54_.py                              | Python     |         16 |         12 |          7 |         35 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/7b8096797296_.py                              | Python     |         16 |         12 |          9 |         37 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/a5d65c70c185_add_code_change_volume_column.py | Python     |         12 |         12 |          9 |         33 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/d31aa6b7a6aa_.py                              | Python     |         32 |         12 |          9 |         53 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/static/js/main.js                                                 | JavaScript |        118 |         13 |         26 |        157 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/index.html                                              | HTML       |        157 |         15 |         30 |        202 |
+| /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/login.html                                              | HTML       |         42 |          1 |          6 |         49 |
+| Total                                                                                                                                                                    |            |        814 |        177 |        260 |      1,251 |
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

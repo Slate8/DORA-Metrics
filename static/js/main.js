@@ -1,5 +1,5 @@
 function updateCharts() {
-    const tableRows = document.querySelectorAll('tbody tr');
+    const tableRows = document.querySelectorAll('#ccvDataBody tr');
     const groupedData = {};
 
     tableRows.forEach(row => {
@@ -136,21 +136,16 @@ projectDropdown.addEventListener('change', () => {
 });
 
 */
-document.getElementById('fetchCCV').addEventListener('click', function() {
+document.getElementById('fetch_project_data').addEventListener('click', function () {
     var projectId = document.getElementById('projectSelector').value;
     window.location.href = '/?project_id=' + projectId;
 });
 
 // Verhindert das Absenden des Formulars wenn kein Projekt ausgewählt ist
-document.querySelector("form").addEventListener("submit", function(event){
+document.querySelector("form").addEventListener("submit", function (event) {
     let selectedProject = document.getElementById("projectSelector").value;
     if (selectedProject === "all") {
         alert("Bitte wählen Sie ein Projekt aus!");
-        event.preventDefault(); 
+        event.preventDefault();
     }
-});
-
-document.getElementById('fetchMTTR').addEventListener('click', function() {
-    var projectId = document.getElementById('projectDropdown').value;
-    window.location.href = '/?project_id=' + projectId;
 });
