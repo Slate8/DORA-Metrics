@@ -33,7 +33,7 @@ from db import db  # Stelle sicher, dass du die notwendigen Imports hast
 from datetime import datetime
 from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-
+from sqlalchemy import extract
 
 app = Flask(__name__, template_folder="templates")
 
@@ -108,22 +108,28 @@ class LTC(db.Model):
 @app.route("/")
 def start_page():
     project_id = request.args.get('project_id', 'all')
-
-    ccv_data = CD_METRIK.query.filter_by(name="Code Change Volume").all()
+    months, monthly_deployments = get_monthly_deployments(project_id)
 
     if project_id == 'all':
         mttr_data = calculate_mttr()  # Berechnet die MTTR für alle Projekte
         ccv_data = CD_METRIK.query.filter_by(name="Code Change Volume").all()
         ltc_data = LTC.query.filter_by(projekt_id=project_id).all()
+        df_data = calculate_deployment_frequency()  # Berechnet die DF für alle Projekte
+        
+
     else:
         # Übergibt die Projekt-ID an Ihre calculate_mttr-Funktion
         mttr_data = calculate_mttr(project_id)
         ccv_data = CD_METRIK.query.filter_by(
             name="Code Change Volume", projekt_id=project_id).all()
         ltc_data = LTC.query.filter_by(projekt_id=project_id).all()
+        df_data = calculate_deployment_frequency(project_id)  # Berechnet die DF für das spezifische Projekt
+    
     projects = Projekt.query.all()
 
-    return render_template('index.html', ccv_data=ccv_data, mttr=mttr_data, projects=projects, ltc_data=ltc_data, current_project_id=project_id)
+    return render_template('index.html', ccv_data=ccv_data, mttr=mttr_data, projects=projects,
+                            ltc_data=ltc_data, current_project_id=project_id, df=df_data,months=months,
+                              monthly_deployments=monthly_deployments)
 
 
 @app.route("/submit_ccv", methods=["POST"])
@@ -284,6 +290,33 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for("login"))
+
+
+def calculate_deployment_frequency(project_id=None):
+    if project_id and project_id != 'all':
+        deployments = LTC.query.filter_by(projekt_id=project_id).count()
+    else:
+        # Zählt alle Deployments in der LTC-Tabelle
+        deployments = LTC.query.count()
+    
+    return deployments
+
+
+
+def get_monthly_deployments(project_id=None):
+    months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
+    monthly_deployments = []
+    
+    for month in range(1, 13):  # Für jeden Monat des Jahres
+        if project_id and project_id != 'all':
+            count = LTC.query.filter(extract('month', LTC.deployment_datetime) == month, LTC.projekt_id == project_id).count()
+        else:
+            count = LTC.query.filter(extract('month', LTC.deployment_datetime) == month).count()
+        monthly_deployments.append(count)
+    
+    return months, monthly_deployments
+
+
 
 
 if __name__ == "__main__":

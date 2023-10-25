@@ -1,3 +1,21 @@
+var myBarChart;
+const predefinedColors = [
+    '#FFCD56', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+    '#FF6384', '#C45850', '#A2CC3A', '#EB3D57', '#FF8A65', '#66BB6A'
+    
+];
+
+const userColorMap = {}; // Ein Objekt zum Speichern der Farben für jeden Benutzernamen
+let currentColorIndex = 0;
+
+function getColorForUser(username) {
+    if (!userColorMap[username]) {
+        userColorMap[username] = predefinedColors[currentColorIndex];
+        currentColorIndex = (currentColorIndex + 1) % predefinedColors.length;
+    }
+    return userColorMap[username];
+}
+
 function updateCharts() {
     const tableRows = document.querySelectorAll('#ccvDataBody tr');
     const groupedData = {};
@@ -38,16 +56,6 @@ function updateCharts() {
         });
 
 
-
-    function getRandomColor() {
-        let letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
     const datasets = [];
 
 
@@ -60,7 +68,7 @@ function updateCharts() {
         });
 
 
-        let color = getRandomColor();
+        let color = getColorForUser(username);
         datasets.push({
             label: `Username: ${username}`,
             data: data,
@@ -99,7 +107,8 @@ function updateCharts() {
     const usernames = Object.keys(userCodeLines);
     const codeLineTotals = Object.values(userCodeLines);
 
-    const backgroundColors = usernames.map(() => getRandomColor());
+    const backgroundColors = usernames.map(getColorForUser);
+
 
     new Chart("myPieChart", {
         type: 'pie',
@@ -124,24 +133,17 @@ function updateCharts() {
 }
 
 updateCharts();
-/*
-const projectDropdown = document.getElementById('projectSelector');
-projectDropdown.addEventListener('change', () => {
-    const selectedProjectId = projectSelector.value;
-    if (selectedProjectId === "all") {
-        window.location.href = '/?project_id=all';
-    } else {
-        window.location.href = '/?project_id=' + selectedProjectId;
-    }
-});
+updateBarChart();
 
-*/
+
 document.getElementById('fetch_project_data').addEventListener('click', function () {
     var projectId = document.getElementById('projectSelector').value;
     window.location.href = '/?project_id=' + projectId;
+    updateBarChart();
 });
 
 // Verhindert das Absenden des Formulars wenn kein Projekt ausgewählt ist
+//wirkt nur auf das erste formular muss noch angepasst werden auf eine spezifische id!!!
 document.querySelector("form").addEventListener("submit", function (event) {
     let selectedProject = document.getElementById("projectSelector").value;
     if (selectedProject === "all") {
@@ -149,3 +151,64 @@ document.querySelector("form").addEventListener("submit", function (event) {
         event.preventDefault();
     }
 });
+
+document.getElementById("ltcForm").addEventListener("submit", function (event) {
+    let selectedProject = document.getElementById("ltcprojectSelector").value;
+    let commitDatetime = document.getElementById("commitDatetime").value;
+    let deploymentDatetime = document.getElementById("deploymentDatetime").value;
+
+    // Überprüfen, ob das Projekt "all" ist
+    if (selectedProject === "all") {
+        alert("Bitte wählen Sie ein Projekt aus!");
+        event.preventDefault();
+        return;  // Beendet die Funktion hier, um weitere Überprüfungen zu vermeiden
+    }
+
+    // Überprüfen, ob die Input-Felder leer sind
+    if (!commitDatetime || !deploymentDatetime) {
+        alert("Bitte füllen Sie alle Datum- und Uhrzeitfelder aus!");
+        event.preventDefault();
+    }
+});
+
+function updateBarChart() {
+
+// Daten aus den data-* Attributen lesen
+const chartDataElement = document.getElementById('chartData');
+const months = JSON.parse(chartDataElement.getAttribute('data-months'));
+const monthlyDeploymentsRaw = JSON.parse(chartDataElement.getAttribute('data-deployments'));
+const monthlyDeployments = monthlyDeploymentsRaw.map(value => (value === null || value === 0) ? 0 : value);
+
+if (myBarChart) {
+    myBarChart.destroy();
+}
+
+var ctx = document.getElementById('myBarChart').getContext('2d');
+myBarChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [{
+            label: 'Deployments pro Monat',
+            data: monthlyDeployments,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        },
+        responsive: true,
+        legend: {
+            position: 'top',
+        }
+    }
+});
+
+}
