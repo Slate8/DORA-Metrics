@@ -12,6 +12,8 @@
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <title>Metriken-Übersicht</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 
 </head>
 
@@ -83,7 +85,7 @@
             <!-- Hier den Inhalt für Code Change Volume einfügen -->
 
 
-            <form method="POST" action="/submit_ccv">
+            <form id="ccvForm" method="POST" action="/submit_ccv">
 
                 <div class="form-group">
                     <label for="ccvInput">Code Change Volume:</label>
@@ -92,6 +94,7 @@
                         <input type="number" class="form-control mt-2" id="ccvInput" name="ccvValue">
                     </div>
                 </div>
+                <input type="hidden" id="hiddenProjectId" name="project_id" value="">
                 <button type="submit" class="btn btn-primary mt-2">Absenden</button>
             </form>
             <div class="row mt-4">
@@ -183,23 +186,20 @@
         </div>
 
         <div class="tab-pane" id="changeFailureRate">
-            <!-- Hier den Inhalt für CFR einfügen -->
-
-
             <h2>Change Failure Rate Berechnung</h2>
 
             <div>
-                <label for="failed">Anzahl der fehlgeschlagenen Deployments:</label>
-                <input type="number" id="failed" name="failed">
+                <label>Anzahl der fehlgeschlagenen Deployments: </label>
+                <span id="failed">{{ failed }}</span>
+                <br>
+                <label>Gesamtzahl der Deployments: </label>
+                <span id="total">{{ total }}</span>
+                
             </div>
 
-            <div>
-                <label for="total">Gesamtzahl der Deployments:</label>
-                <input type="number" id="total" name="total">
-            </div>
-
-            <p>Die aktuelle Change Failure Rate für das ausgewählte Projekt beträgt: <strong>{{ cfr }}</strong></p>
+            <p>Die aktuelle Change Failure Rate für das ausgewählte Projekt beträgt: {{ cfr }}% </p>
         </div>
+
 
         <div class="tab-pane" id="deployment">
             <!-- Hier den Inhalt für Deploy einfügen -->
@@ -247,6 +247,14 @@
                         {% endfor %}
                     </select>
                 </div>
+                <div>
+                    <label>Deployment Status:</label>
+                    <input type="radio" id="success" name="deployment_status" value="true" checked>
+                    <label for="success">Erfolgreich</label>
+
+                    <input type="radio" id="failure" name="deployment_status" value="false">
+                    <label for="failure">Fehlgeschlagen</label>
+                </div>
 
                 <button type="submit" class="btn btn-primary">Erfassung absenden</button>
             </form>
@@ -261,6 +269,8 @@
                                 <th class="text-center">Commit Datum</th>
                                 <th class="text-center">Deployment Datum</th>
                                 <th class="text-center">Lead Time</th>
+                                <th class="text-center">Deploy Succesfull</th>
+                                <th class="text-center">Actions</th>
                                 <!-- Andere notwendige Spalten können hier hinzugefügt werden -->
                             </tr>
                         </thead>
@@ -271,6 +281,16 @@
                                 <td class="text-center">{{ ltc.commit_datetime.strftime('%H:%M %d.%m.%Y') }}</td>
                                 <td class="text-center">{{ ltc.deployment_datetime.strftime('%H:%M %d.%m.%Y') }}</td>
                                 <td class="text-center">{{ '%.2f'|format(ltc.value) }}</td>
+                                <td class="text-center">{{ ltc.deployment_successful }}</td>
+                                <!--  <td class="text-center">
+                                    Bearbeiten-Link für diesen LTC-Eintrag 
+                                    <a href="{{ url_for('edit_ltc', ltc_id=ltc.id) }}" class="btn btn-sm btn-primary">Bearbeiten</a>
+                                </td>-->
+                                <td class="text-center">
+                                    <a href="{{ url_for('edit_ltc', ltc_id=ltc.id) }}">
+                                        <i class="fas fa-cog"></i>
+                                    </a>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

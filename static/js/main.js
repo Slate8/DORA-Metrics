@@ -144,13 +144,27 @@ document.getElementById('fetch_project_data').addEventListener('click', function
 
 // Verhindert das Absenden des Formulars wenn kein Projekt ausgewählt ist
 //wirkt nur auf das erste formular muss noch angepasst werden auf eine spezifische id!!!
-document.querySelector("form").addEventListener("submit", function (event) {
+document.getElementById("ccvForm").addEventListener("submit", function (event) {
+    let ccvValue = document.getElementById("ccvInput").value;
     let selectedProject = document.getElementById("projectSelector").value;
+    document.getElementById("hiddenProjectId").value = selectedProject;
     if (selectedProject === "all") {
         alert("Bitte wählen Sie ein Projekt aus!");
         event.preventDefault();
+        return
+    }
+    if (!ccvValue) {
+        alert("Bitte geben Sie Ihren CCV-Wert ein!");
+        event.preventDefault();
+        
     }
 });
+/*
+document.getElementById("submit_ccv").addEventListener("submit", function(event) {
+    const projectId = document.getElementById("projectSelector").value;
+    document.getElementById("hiddenProjectId").value = projectId;
+});
+*/
 
 document.getElementById("ltcForm").addEventListener("submit", function (event) {
     let selectedProject = document.getElementById("ltcprojectSelector").value;

@@ -34,6 +34,8 @@ from datetime import datetime
 from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from sqlalchemy import extract
+from models import User, CD_METRIK, Projekt, Incident, LTC
+
 
 app = Flask(__name__, template_folder="templates")
 
@@ -49,62 +51,6 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
 
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)
-
-
-class CD_METRIK(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
-    # muss noch gelöscht werden oder angepasst
-    value = db.Column(db.Float, nullable=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    code_change_volume = db.Column(db.Float, nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        'user.id', name="fk_cd_metrik_user_id"))
-    user = db.relationship('User')
-    projekt_id = db.Column(db.Integer, db.ForeignKey(
-        'projekt.id', name="fk_cd_metrik_projekt_id"))
-
-
-class Projekt(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), unique=True, nullable=False)
-    description = db.Column(db.String(500), nullable=True)  # Optional
-    metrics = db.relationship('CD_METRIK', backref='projekt')
-
-
-class Incident(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    start_time = db.Column(db.DateTime, nullable=False)
-    end_time = db.Column(db.DateTime, nullable=False)
-    description = db.Column(db.String(500), nullable=True)
-    cause = db.Column(db.String(500), nullable=True)
-    resolution = db.Column(db.String(500), nullable=True)
-    projekt_id = db.Column(db.Integer, db.ForeignKey(
-        'projekt.id', name="fk_incident_projekt_id"), nullable=False)
-    projekt = db.relationship('Projekt', backref='incidents')
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        'user.id', name="fk_incident_user_id"), nullable=False)
-    user = db.relationship('User', backref='incidents')
-
-
-class LTC(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    value = db.Column(db.Float, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    commit_datetime = db.Column(db.DateTime, nullable=False)  # hinzugefügt
-    deployment_datetime = db.Column(db.DateTime, nullable=False)  # hinzugefügt
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        'user.id', name="fk_ltc_user_id"))
-    user = db.relationship('User')
-    projekt_id = db.Column(db.Integer, db.ForeignKey(
-        'projekt.id', name="fk_ltc_projekt_id"))
-    projekt = db.relationship('Projekt')
-
-
 @app.route("/")
 def start_page():
     project_id = request.args.get('project_id', 'all')
@@ -115,21 +61,39 @@ def start_page():
         ccv_data = CD_METRIK.query.filter_by(name="Code Change Volume").all()
         ltc_data = LTC.query.filter_by(projekt_id=project_id).all()
         df_data = calculate_deployment_frequency()  # Berechnet die DF für alle Projekte
-        
 
+        # Zählen der fehlgeschlagenen Deployments
+        failed_deployments = LTC.query.filter_by(
+            deployment_successful=False).count()
+        # Zählen  aller Deployments
+        total_deployments = LTC.query.count()
     else:
         # Übergibt die Projekt-ID an Ihre calculate_mttr-Funktion
         mttr_data = calculate_mttr(project_id)
         ccv_data = CD_METRIK.query.filter_by(
             name="Code Change Volume", projekt_id=project_id).all()
         ltc_data = LTC.query.filter_by(projekt_id=project_id).all()
-        df_data = calculate_deployment_frequency(project_id)  # Berechnet die DF für das spezifische Projekt
-    
+        # Berechnet die DF für das spezifische Projekt
+        df_data = calculate_deployment_frequency(project_id)
+        # Zählen Sie die fehlgeschlagenen Deployments für das spezifische Projekt
+        failed_deployments = LTC.query.filter_by(
+            deployment_successful=False, projekt_id=project_id).count()
+
+        # Zählen Sie alle Deployments für das spezifische Projekt
+        total_deployments = LTC.query.filter_by(projekt_id=project_id).count()
+
+        # Berechnen Sie die CFR
+    if total_deployments != 0:
+        cfr = (failed_deployments / total_deployments) * 100
+    else:
+        cfr = 0
+
     projects = Projekt.query.all()
 
     return render_template('index.html', ccv_data=ccv_data, mttr=mttr_data, projects=projects,
-                            ltc_data=ltc_data, current_project_id=project_id, df=df_data,months=months,
-                              monthly_deployments=monthly_deployments)
+                           ltc_data=ltc_data, current_project_id=project_id, df=df_data, months=months,
+                           monthly_deployments=monthly_deployments, failed=failed_deployments,
+                           total=total_deployments, cfr=cfr)
 
 
 @app.route("/submit_ccv", methods=["POST"])
@@ -191,6 +155,8 @@ def submit_ltc():
     commit_datetime = request.form["commit_datetime"]
     deployment_datetime = request.form["deployment_datetime"]
     selected_project_id = request.form["project_id"]
+    deployment_status = True if request.form.get(
+        "deployment_status") == "true" else False
 
     # Überprüfen , ob selected_project_id "all" ist
     if selected_project_id == "all":
@@ -202,16 +168,62 @@ def submit_ltc():
     ltc_value = (deployment_datetime_obj -
                  commit_datetime_obj).total_seconds() / 3600  # LTC in Stunden
 
-    # Speichern  ltc_value, commit_datetime, deployment_datetime und selected_project_id in der Datenbank
+    # Speichern  ltc_value, commit_datetime, deployment_datetime, deployment_status und selected_project_id in der Datenbank
     new_ltc = LTC(value=ltc_value,
                   commit_datetime=commit_datetime_obj,
-                  deployment_datetime=deployment_datetime_obj,
+                  deployment_datetime=deployment_datetime_obj, deployment_successful=deployment_status,
                   user_id=current_user.id,
                   projekt_id=selected_project_id)
     db.session.add(new_ltc)
     db.session.commit()
 
     # Nach dem Absenden zur Startseite weiterleiten
+    return redirect(url_for("start_page"))
+
+
+@app.route("/edit_ltc/<int:ltc_id>", methods=["GET"])
+@login_required
+def edit_ltc(ltc_id):
+    # Holt den LTC-Eintrag aus der Datenbank
+    ltc = LTC.query.get_or_404(ltc_id)
+
+    # Stellt sicher, dass der aktuelle Benutzer berechtigt ist, diesen Eintrag zu bearbeiten
+    if ltc.user_id != current_user.id:
+        abort(403)  # Forbidden
+
+    projects = Projekt.query.all()
+    return render_template('edit_ltc.html', ltc=ltc, projects=projects)
+
+
+@app.route("/update_ltc/<int:ltc_id>", methods=["POST"])
+@login_required
+def update_ltc(ltc_id):
+    ltc = LTC.query.get_or_404(ltc_id)
+
+    # Stellt wieder sicher, dass der aktuelle Benutzer berechtigt ist
+    if ltc.user_id != current_user.id:
+        abort(403)
+
+    # Eingegebene Daten aus dem Formular holen
+    commit_datetime = request.form["commit_datetime"]
+    deployment_datetime = request.form["deployment_datetime"]
+    deployment_status = request.form["deployment_status"]
+    selected_project_id = request.form["project_id"]
+
+    # Werte aktualisieren
+    ltc.commit_datetime = datetime.fromisoformat(commit_datetime)
+    ltc.deployment_datetime = datetime.fromisoformat(deployment_datetime)
+    ltc.deployment_successful = True if deployment_status == "true" else False
+    ltc.projekt_id = selected_project_id if selected_project_id != "all" else None
+
+    # Lead Time to Change neu berechnen
+    ltc_value = (ltc.deployment_datetime -
+                 ltc.commit_datetime).total_seconds() / 3600  # LTC in Stunden
+    ltc.value = ltc_value
+
+    db.session.commit()
+
+    # Nach dem Update zur Startseite oder einer anderen geeigneten Seite weiterleiten
     return redirect(url_for("start_page"))
 
 
@@ -298,25 +310,25 @@ def calculate_deployment_frequency(project_id=None):
     else:
         # Zählt alle Deployments in der LTC-Tabelle
         deployments = LTC.query.count()
-    
+
     return deployments
 
 
-
 def get_monthly_deployments(project_id=None):
-    months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
+    months = ["Januar", "Februar", "März", "April", "Mai", "Juni",
+              "Juli", "August", "September", "Oktober", "November", "Dezember"]
     monthly_deployments = []
-    
+
     for month in range(1, 13):  # Für jeden Monat des Jahres
         if project_id and project_id != 'all':
-            count = LTC.query.filter(extract('month', LTC.deployment_datetime) == month, LTC.projekt_id == project_id).count()
+            count = LTC.query.filter(extract(
+                'month', LTC.deployment_datetime) == month, LTC.projekt_id == project_id).count()
         else:
-            count = LTC.query.filter(extract('month', LTC.deployment_datetime) == month).count()
+            count = LTC.query.filter(
+                extract('month', LTC.deployment_datetime) == month).count()
         monthly_deployments.append(count)
-    
+
     return months, monthly_deployments
-
-
 
 
 if __name__ == "__main__":
