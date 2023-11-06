@@ -27,7 +27,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="d-flex flex-column">
+                <div class="d-flex flex-column mx-auto">
                     <ul class="nav nav-tabs" id="metricTabs">
                         <li class="nav-item">
                             <a class="nav-link active" data-toggle="tab" href="#codeChangeVolume">Code Change Volume
@@ -48,7 +48,7 @@
                                 (LTC)</a>
                         </li>
                     </ul>
-                    <div class="input-group mb-3 mt-2  justify-content-end  ">
+                    <div class="input-group mb-2 mt-2  justify-content-end  ">
                         <div class="input-group-prepend ">
                             <label class="input-group-text m-1" for="projectSelector">Bitte wähle ein Projekt
                                 aus:</label>
@@ -70,15 +70,12 @@
                 </div>
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link btn btn-danger" href="/logout">Logout</a>
+                        <a class="btn btn-outline-primary" href="/logout">Logout</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-
-
-
 
     <div class="tab-content m-3">
         <div class="tab-pane active" id="codeChangeVolume">
@@ -138,52 +135,85 @@
 
         <div class="tab-pane" id="mttr">
             <!-- Hier den Inhalt für MTTR einfügen -->
+            <div class="container">
+                <div class="row">
+                    <p> Für das akuell ausgewählte Projekt beträgt die Mean Time To Recover (MTTR): {{ mttr }}</p>
 
 
-            <p> Für das akuell ausgewählte Projekt beträgt die Mean Time To Recover (MTTR): {{ mttr }}</p>
+                    <p>Hier kannst du die Details für einen Vorfall eingeben:</p>
+                    <div class="col-md-6">
+                        <form method="POST" action="/submit_mttr">
+                            <!-- Startzeit des Vorfalls -->
+                            <div class="form-group">
+                                <label for="start_timeInput">Startzeit des Vorfalls:</label>
+                                <input type="datetime-local" class="form-control" id="start_timeInput"
+                                    name="start_time">
+                            </div>
+                            <!-- Endzeit des Vorfalls -->
+                            <div class="form-group">
+                                <label for="end_timeInput">Endzeit des Vorfalls:</label>
+                                <input type="datetime-local" class="form-control" id="end_timeInput" name="end_time">
+                            </div>
+                            <!-- Beschreibung des Vorfalls -->
+                            <div class="form-group">
+                                <label for="descriptionInput">Beschreibung:</label>
+                                <textarea class="form-control" id="descriptionInput" name="description"
+                                    rows="3"></textarea>
+                            </div>
+                            <!-- Ursache des Vorfalls -->
+                            <div class="form-group">
+                                <label for="causeInput">Ursache:</label>
+                                <textarea class="form-control" id="causeInput" name="cause" rows="3"></textarea>
+                            </div>
+                            <!-- Wie wurde das Problem behoben -->
+                            <div class="form-group">
+                                <label for="resolutionInput">Behebung:</label>
+                                <textarea class="form-control" id="resolutionInput" name="resolution"
+                                    rows="3"></textarea>
+                            </div>
+                            <!-- Auswahl des zugehörigen Projekts -->
+                            <div class="form-group">
+                                <label for="projectSelect">Projekt:</label>
+                                <select class="form-control" id="projectSelect" name="project_id">
+                                    <!-- Hier sollten die Projekt-Optionen aus der Datenbank geladen werden -->
+                                    {% for project in projects %}
+                                    <option value="{{ project.id }}">{{ project.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Absenden</button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table">
+                            <!-- Tabellenkopf -->
+                            <thead>
+                                <tr>
+                                    <th>Startzeit</th>
+                                    <th>Endzeit</th>
+                                    <th>Beschreibung</th>
+                                    <th>Projekt</th>
+                                </tr>
+                            </thead>
+                            <!-- Tabellenkörper -->
+                            <tbody>
+                                {% for incident in incident_data %}
+                                <tr>
+                                    <td>{{ incident.start_time }}</td>
+                                    <td>{{ incident.end_time }}</td>
+                                    <td>{{ incident.description }}</td>
+                                    <td>{{ incident.projekt.name }}</td>
+                                    
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-
-
-            <p>Hier kannst du die Details für einen Vorfall eingeben:</p>
-            <form method="POST" action="/submit_mttr">
-                <!-- Startzeit des Vorfalls -->
-                <div class="form-group">
-                    <label for="start_timeInput">Startzeit des Vorfalls:</label>
-                    <input type="datetime-local" class="form-control" id="start_timeInput" name="start_time">
-                </div>
-                <!-- Endzeit des Vorfalls -->
-                <div class="form-group">
-                    <label for="end_timeInput">Endzeit des Vorfalls:</label>
-                    <input type="datetime-local" class="form-control" id="end_timeInput" name="end_time">
-                </div>
-                <!-- Beschreibung des Vorfalls -->
-                <div class="form-group">
-                    <label for="descriptionInput">Beschreibung:</label>
-                    <textarea class="form-control" id="descriptionInput" name="description" rows="3"></textarea>
-                </div>
-                <!-- Ursache des Vorfalls -->
-                <div class="form-group">
-                    <label for="causeInput">Ursache:</label>
-                    <textarea class="form-control" id="causeInput" name="cause" rows="3"></textarea>
-                </div>
-                <!-- Wie wurde das Problem behoben -->
-                <div class="form-group">
-                    <label for="resolutionInput">Behebung:</label>
-                    <textarea class="form-control" id="resolutionInput" name="resolution" rows="3"></textarea>
-                </div>
-                <!-- Auswahl des zugehörigen Projekts -->
-                <div class="form-group">
-                    <label for="projectSelect">Projekt:</label>
-                    <select class="form-control" id="projectSelect" name="project_id">
-                        <!-- Hier sollten die Projekt-Optionen aus der Datenbank geladen werden -->
-                        {% for project in projects %}
-                        <option value="{{ project.id }}">{{ project.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Absenden</button>
-            </form>
         </div>
+
 
         <div class="tab-pane" id="changeFailureRate">
             <h2>Change Failure Rate Berechnung</h2>
@@ -194,7 +224,7 @@
                 <br>
                 <label>Gesamtzahl der Deployments: </label>
                 <span id="total">{{ total }}</span>
-                
+
             </div>
 
             <p>Die aktuelle Change Failure Rate für das ausgewählte Projekt beträgt: {{ cfr }}% </p>

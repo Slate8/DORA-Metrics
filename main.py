@@ -61,7 +61,7 @@ def start_page():
         ccv_data = CD_METRIK.query.filter_by(name="Code Change Volume").all()
         ltc_data = LTC.query.filter_by(projekt_id=project_id).all()
         df_data = calculate_deployment_frequency()  # Berechnet die DF für alle Projekte
-
+        incident_data = Incident.query.all()
         # Zählen der fehlgeschlagenen Deployments
         failed_deployments = LTC.query.filter_by(
             deployment_successful=False).count()
@@ -81,6 +81,7 @@ def start_page():
 
         # Zählen Sie alle Deployments für das spezifische Projekt
         total_deployments = LTC.query.filter_by(projekt_id=project_id).count()
+        incident_data = Incident.query.filter_by(projekt_id=project_id).all()
 
         # Berechnen Sie die CFR
     if total_deployments != 0:
@@ -93,7 +94,7 @@ def start_page():
     return render_template('index.html', ccv_data=ccv_data, mttr=mttr_data, projects=projects,
                            ltc_data=ltc_data, current_project_id=project_id, df=df_data, months=months,
                            monthly_deployments=monthly_deployments, failed=failed_deployments,
-                           total=total_deployments, cfr=cfr)
+                           total=total_deployments, cfr=cfr,incident_data=incident_data)
 
 
 @app.route("/submit_ccv", methods=["POST"])
