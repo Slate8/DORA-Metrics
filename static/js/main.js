@@ -135,13 +135,124 @@ function updateCharts() {
 updateCharts();
 updateBarChart();
 
-
+/*
 document.getElementById('fetch_project_data').addEventListener('click', function () {
     var projectId = document.getElementById('projectSelector').value;
     window.location.href = '/?project_id=' + projectId;
     updateBarChart();
 });
+*/
 
+/*
+document.getElementById('fetch_project_data').addEventListener('click', function () {
+    var projectId = document.getElementById('projectSelector').value;
+    fetch('/get_cd_metric_data?project_id=' + projectId) // Pfad muss Ihrem Backend-Endpoint entsprechen
+        .then(response => response.json())
+        .then(data => {
+            // Aktualisieren   die Tabelle mit neuen Daten
+            var tbody = document.getElementById('ccvDataBody');
+            tbody.innerHTML = ''; // Löschen   den vorhandenen Tabelleninhalt
+            // Erstellen   neue Tabellenzeilen mit den abgerufenen Daten
+            data.forEach(metric => {
+                var row = tbody.insertRow();
+                row.innerHTML = `<td class="text-center">${metric.timestamp}</td>
+                                 <td class="text-center">${metric.code_change_volume}</td>
+                                 <td class="text-center">${metric.user}</td>
+                                 <td class="text-center">${metric.projekt}</td>`;
+            });
+
+            // Nach dem Aktualisieren der Tabelle müssen   updateCharts erneut aufrufen
+            updateCharts();
+   
+        })
+        .catch(error => console.error('Fehler beim Abrufen der Daten:', error));
+});
+*/
+
+document.getElementById('fetch_project_data').addEventListener('click', function () {
+    var projectId = document.getElementById('projectSelector').value;
+    // Starten   einen Fetch für jede Datenquelle
+    Promise.all([
+        fetch('/get_cd_metric_data?project_id=' + projectId).then(response => response.json()),
+        fetch('/get_ltc_data?project_id=' + projectId).then(response => response.json()),
+        fetch('/get_mttr_data?project_id=' + projectId).then(response => response.json()),
+        fetch('/get_cfr_data?project_id=' + projectId).then(response => response.json()),
+        // ... fügen   hier weitere fetch Aufrufe für andere Datenquellen hinzu
+    ])
+    .then(alldata => {
+        // alldata[0] enthält die Antwort von '/get_cd_metric_data'
+        // alldata[1] enthält die Antwort von '/get_ltc_data'
+        // ... und so weiter für weitere Antworten
+
+        // Aktualisieren   hier die Tabellen mit den Daten von alldata
+        updateCCVTable(alldata[0]); // Eine hypothetische Funktion, um die CCV-Tabelle zu aktualisieren
+        updateLTCTable(alldata[1]); // Eine hypothetische Funktion, um die LTC-Tabelle zu aktualisieren
+        updateMTTRTable(alldata[2].data);
+        updateMTTRDisplay(alldata[2].mttr);
+        updateCFRDisplay(alldata[3]); // Ihre neue Funktion, um die CFR anzuzeigen
+        // ... weitere Funktionen, um andere Tabellen zu aktualisieren
+
+        // Nach dem Aktualisieren der Tabellen rufen   updateCharts erneut auf
+        updateCharts();
+    })
+    .catch(error => console.error('Fehler beim Abrufen der Daten:', error));
+});
+
+// Beispiel Funktion, um die CCV Tabelle zu aktualisieren
+function updateCCVTable(data) {
+    var tbody = document.getElementById('ccvDataBody');
+    tbody.innerHTML = ''; // Löschen   den vorhandenen Tabelleninhalt
+    // Erstellen   neue Tabellenzeilen mit den abgerufenen Daten
+    data.forEach(metric => {
+        var row = tbody.insertRow();
+        row.innerHTML = `<td class="text-center">${metric.timestamp}</td>
+                         <td class="text-center">${metric.code_change_volume}</td>
+                         <td class="text-center">${metric.user}</td>
+                         <td class="text-center">${metric.projekt}</td>`;
+    });
+}
+function updateLTCTable(data) {
+    var tbody = document.getElementById('ltcDataBody');
+    tbody.innerHTML = ''; // Löschen   den vorhandenen Tabelleninhalt
+    // Erstellen   neue Tabellenzeilen mit den abgerufenen Daten
+    data.forEach(metric => {
+        var row = tbody.insertRow();
+        row.innerHTML = `<td class="text-center">${metric.commit}</td>
+                         <td class="text-center">${metric.deploy}</td>
+                         <td class="text-center">${metric.ltc_value}</td>
+                         <td class="text-center">${metric.deploy_successful}</td>
+                         <td class="text-center">
+                         <a href="/edit_ltc/${metric.id}">
+                             <i class="fas fa-cog"></i>
+                         </a>
+                     </td>`;
+    });
+}
+function updateMTTRTable(data) {
+    var tbody = document.getElementById('mttrDataBody');
+    tbody.innerHTML = ''; // Löscht den vorhandenen Tabelleninhalt
+    // Erstellen   neue Tabellenzeilen mit den abgerufenen Daten
+    data.forEach(metric => {
+        var row = tbody.insertRow();
+        row.innerHTML = `<td class="text-center">${metric.starttime}</td>
+                         <td class="text-center">${metric.endtime}</td>
+                         <td class="text-center">${metric.description}</td>
+                         <td class="text-center">${metric.project}</td>`;
+                         
+    });
+    
+}
+function updateMTTRDisplay(mttr) {
+    var mttrDisplay = document.getElementById('mttrDisplay');
+    mttrDisplay.innerText = mttr; // Nur der Wert von MTTR wird hier aktualisiert
+}
+
+function updateCFRDisplay(cfrData) {
+    document.getElementById('failed').innerText = cfrData.failed;
+    document.getElementById('total').innerText = cfrData.total;
+    document.getElementById('cfrDisplay').innerText = cfrData.cfr.toFixed(2) + '%'; // Formatieren auf 2 Dezimalstellen
+}
+  
 // Verhindert das Absenden des Formulars wenn kein Projekt ausgewählt ist
 //wirkt nur auf das erste formular muss noch angepasst werden auf eine spezifische id!!!
 document.getElementById("ccvForm").addEventListener("submit", function (event) {
@@ -149,12 +260,12 @@ document.getElementById("ccvForm").addEventListener("submit", function (event) {
     let selectedProject = document.getElementById("projectSelector").value;
     document.getElementById("hiddenProjectId").value = selectedProject;
     if (selectedProject === "all") {
-        alert("Bitte wählen Sie ein Projekt aus!");
+        alert("Bitte wählen   ein Projekt aus!");
         event.preventDefault();
         return
     }
     if (!ccvValue) {
-        alert("Bitte geben Sie Ihren CCV-Wert ein!");
+        alert("Bitte geben   Ihren CCV-Wert ein!");
         event.preventDefault();
         
     }
@@ -173,14 +284,14 @@ document.getElementById("ltcForm").addEventListener("submit", function (event) {
 
     // Überprüfen, ob das Projekt "all" ist
     if (selectedProject === "all") {
-        alert("Bitte wählen Sie ein Projekt aus!");
+        alert("Bitte wählen   ein Projekt aus!");
         event.preventDefault();
         return;  // Beendet die Funktion hier, um weitere Überprüfungen zu vermeiden
     }
 
     // Überprüfen, ob die Input-Felder leer sind
     if (!commitDatetime || !deploymentDatetime) {
-        alert("Bitte füllen Sie alle Datum- und Uhrzeitfelder aus!");
+        alert("Bitte füllen   alle Datum- und Uhrzeitfelder aus!");
         event.preventDefault();
     }
 });
