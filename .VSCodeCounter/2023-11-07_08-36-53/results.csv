@@ -1,22 +1,28 @@
-"filename", "language", "JavaScript", "Python", "HTML", "Markdown", "Ini", "comment", "blank", "total"
+"filename", "language", "HTML", "Python", "JavaScript", "Markdown", "Ini", "comment", "blank", "total"
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/README.md", "Markdown", 0, 0, 0, 14, 0, 0, 11, 25
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/add_metric.py", "Python", 0, 38, 0, 0, 0, 2, 9, 49
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/add_project.py", "Python", 0, 16, 0, 0, 0, 0, 5, 21
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/add_user.py", "Python", 0, 16, 0, 0, 0, 0, 5, 21
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/db.py", "Python", 0, 2, 0, 0, 0, 0, 2, 4
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/delete_db.py", "Python", 0, 30, 0, 0, 0, 0, 7, 37
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/main.py", "Python", 0, 141, 0, 0, 0, 16, 54, 211
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/main.py", "Python", 0, 246, 0, 0, 0, 64, 80, 390
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/alembic.ini", "Ini", 0, 0, 0, 0, 38, 0, 13, 51
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/env.py", "Python", 0, 54, 0, 0, 0, 34, 26, 114
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/0a21c3da577f_.py", "Python", 0, 12, 0, 0, 0, 12, 9, 33
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/22a4b5ae535a_.py", "Python", 0, 14, 0, 0, 0, 12, 9, 35
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/3011b84cd898_.py", "Python", 0, 24, 0, 0, 0, 12, 7, 43
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/3a3b0e80b297_.py", "Python", 0, 14, 0, 0, 0, 12, 9, 35
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/49810ee574e0_.py", "Python", 0, 20, 0, 0, 0, 12, 7, 39
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/7135d8fabc54_.py", "Python", 0, 16, 0, 0, 0, 12, 7, 35
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/7b8096797296_.py", "Python", 0, 16, 0, 0, 0, 12, 9, 37
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/85305457bfb4_.py", "Python", 0, 16, 0, 0, 0, 12, 9, 37
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/a5d65c70c185_add_code_change_volume_column.py", "Python", 0, 12, 0, 0, 0, 12, 9, 33
 "/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/d31aa6b7a6aa_.py", "Python", 0, 32, 0, 0, 0, 12, 9, 53
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/static/js/main.js", "JavaScript", 118, 0, 0, 0, 0, 13, 26, 157
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/index.html", "HTML", 0, 0, 157, 0, 0, 15, 30, 202
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/login.html", "HTML", 0, 0, 42, 0, 0, 1, 6, 49
-"Total", "-", 118, 445, 199, 14, 38, 177, 260, 1251
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/d60e16d204f8_.py", "Python", 0, 14, 0, 0, 0, 12, 9, 35
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/f773ac403d7e_.py", "Python", 0, 19, 0, 0, 0, 12, 7, 38
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/models.py", "Python", 0, 49, 0, 0, 0, 1, 9, 59
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/static/js/main.js", "JavaScript", 0, 0, 214, 0, 0, 54, 45, 313
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/edit_ltc.html", "HTML", 48, 0, 0, 0, 0, 3, 11, 62
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/index.html", "HTML", 280, 0, 0, 0, 0, 23, 44, 347
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/login.html", "HTML", 42, 0, 0, 0, 0, 1, 6, 49
+"Total", "-", 370, 660, 214, 14, 38, 326, 373, 1995

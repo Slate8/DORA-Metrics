@@ -1,0 +1,51 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f7f6; 
+    font-family: Arial, sans-serif;
+}
+.login-container {
+    text-align: left;
+    max-width: 350px; 
+}
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 20px; 
+    border: 1px solid #ced4da;
+    width: 100%;
+}
+.login-form button {
+    border-radius: 20px; 
+    padding: 10px 15px;
+    width: 100%;
+}
+.login-logo {
+    margin-bottom: 20px;
+}
+.login-container  p {
+    margin-top: -1rem;
+    flex-shrink: 0;
+    padding-left: 0.1rem;
+}
+.login-header {
+    display: flex;
+    align-items: center; /* Zentriert die Elemente vertikal */
+    justify-content: flex-start; /* Ausrichtung am Anfang */
+}
+
+.text-container {
+    margin-right: 20px; /* Ändere den Wert nach Bedarf, um den Abstand zwischen Text und Logo anzupassen */
+    flex-shrink: 0;
+}
+
+.logo {
+    width: 75px;
+    height: auto;
+    position: relative;
+    left: -20px; /* Bewegt das Logo 20px näher an den Text. Negative Werte bewegen es nach links. */
+}
+

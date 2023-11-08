@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>PanDORA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
@@ -21,7 +21,10 @@
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">DORA-METRICS</a>
+            <div class="row">
+            <a class="navbar-brand" href="/">PanDORA</a>
+            <p>Performance Analyzer for DORA Metrics</p>
+        </div>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -137,7 +140,8 @@
             <!-- Hier den Inhalt für MTTR einfügen -->
             <div class="container">
                 <div class="row">
-                    <p> Für das akuell ausgewählte Projekt beträgt die Mean Time To Recover (MTTR): {{ mttr }}</p>
+                  
+                    <p>Die Mean Time To Recover (MTTR) beträgt: <span id="mttrDisplay">Zum abrufen der MTTR "Daten abrufen" klicken</span></p>
 
 
                     <p>Hier kannst du die Details für einen Vorfall eingeben:</p>
@@ -196,11 +200,11 @@
                                 </tr>
                             </thead>
                             <!-- Tabellenkörper -->
-                            <tbody>
+                            <tbody id="mttrDataBody">
                                 {% for incident in incident_data %}
                                 <tr>
-                                    <td>{{ incident.start_time }}</td>
-                                    <td>{{ incident.end_time }}</td>
+                                    <td>{{ incident.start_time.strftime('%H:%M %d.%m.%Y') }}</td>
+                                    <td>{{ incident.end_time.strftime('%H:%M %d.%m.%Y') }}</td>
                                     <td>{{ incident.description }}</td>
                                     <td>{{ incident.projekt.name }}</td>
                                     
@@ -227,7 +231,8 @@
 
             </div>
 
-            <p>Die aktuelle Change Failure Rate für das ausgewählte Projekt beträgt: {{ cfr }}% </p>
+            <p>Die aktuelle Change Failure Rate für das ausgewählte Projekt beträgt: <span id="cfrDisplay">{{ cfr }}%</span></p>
+
         </div>
 
 
@@ -304,7 +309,7 @@
                                 <!-- Andere notwendige Spalten können hier hinzugefügt werden -->
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="ltcDataBody">
                             <!-- Hier sollten die Daten aus der Datenbank geladen werden -->
                             {% for ltc in ltc_data %}
                             <tr>

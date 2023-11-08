@@ -35,6 +35,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from sqlalchemy import extract
 from models import User, CD_METRIK, Projekt, Incident, LTC
+from sqlalchemy.orm import joinedload
 
 
 app = Flask(__name__, template_folder="templates")
@@ -49,9 +50,10 @@ migrate = Migrate(app, db)
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
-
+login_manager.init_app(app)
 
 @app.route("/")
+@login_required
 def start_page():
     project_id = request.args.get('project_id', 'all')
     months, monthly_deployments = get_monthly_deployments(project_id)
@@ -75,7 +77,7 @@ def start_page():
         ltc_data = LTC.query.filter_by(projekt_id=project_id).all()
         # Berechnet die DF für das spezifische Projekt
         df_data = calculate_deployment_frequency(project_id)
-        # Zählen Sie die fehlgeschlagenen Deployments für das spezifische Projekt
+        # Zählen der fehlgeschlagenen Deployments für das spezifische Projekt
         failed_deployments = LTC.query.filter_by(
             deployment_successful=False, projekt_id=project_id).count()
 
@@ -83,7 +85,7 @@ def start_page():
         total_deployments = LTC.query.filter_by(projekt_id=project_id).count()
         incident_data = Incident.query.filter_by(projekt_id=project_id).all()
 
-        # Berechnen Sie die CFR
+        # Berechnen der CFR
     if total_deployments != 0:
         cfr = (failed_deployments / total_deployments) * 100
     else:
@@ -95,6 +97,114 @@ def start_page():
                            ltc_data=ltc_data, current_project_id=project_id, df=df_data, months=months,
                            monthly_deployments=monthly_deployments, failed=failed_deployments,
                            total=total_deployments, cfr=cfr,incident_data=incident_data)
+
+
+
+#mit AJAX Anpassung
+@app.route('/get_cd_metric_data')
+def get_cd_metric_data():
+    project_id = request.args.get('project_id', 'all')
+    if project_id == 'all':
+        metrics_data = CD_METRIK.query.options(joinedload(CD_METRIK.user)).all()
+    else:
+        metrics_data = CD_METRIK.query.options(joinedload(CD_METRIK.user)).filter_by(projekt_id=project_id).all()
+    
+    # Konvertieren der Daten in ein serialisierbares Format
+    metrics_data_list = [
+        {
+            'id': metric.id,
+            'name': metric.name,
+            'value': metric.value,
+            'timestamp': metric.timestamp.strftime('%H:%M %d.%m.%Y'),
+            'code_change_volume': metric.code_change_volume,
+            'user_id': metric.user_id,
+            'user': metric.user.username,  
+            'projekt_id': metric.projekt_id,
+            'projekt': metric.projekt.name if metric.projekt else None
+        }
+        for metric in metrics_data
+    ]
+    
+    return jsonify(metrics_data_list)
+
+@app.route('/get_ltc_data')
+def get_ltc_data():
+    project_id = request.args.get('project_id', 'all')
+    if project_id == 'all':
+        ltc_data = LTC.query.all()
+    else:
+        ltc_data = LTC.query.filter_by(projekt_id=project_id).all()
+    
+    # Konvertieren der Daten in ein serialisierbares Format
+    ltc_data_list = [
+        {
+            'id': data.id,
+            'ltc_value': f'{data.value:.2f}',
+            'commit':data.commit_datetime.strftime('%H:%M %d.%m.%Y'),
+            'deploy':data.deployment_datetime.strftime('%H:%M %d.%m.%Y'),
+            'user':data.user.username,
+            'deploy_successful': str(data.deployment_successful)
+                   }
+        for data in ltc_data
+    ]
+    
+    return jsonify(ltc_data_list)
+
+@app.route('/get_mttr_data')
+def get_mttr_data():
+    project_id = request.args.get('project_id', 'all')
+    if project_id == 'all':
+        incidents = Incident.query.all()
+    else:
+        incidents = Incident.query.filter_by(projekt_id=project_id).all()
+    
+   # Hier beginnt die MTTR-Berechnung
+    total_duration = sum((incident.end_time - incident.start_time).total_seconds() for incident in incidents)
+    mttr_seconds = total_duration / len(incidents) if incidents else 0
+
+    # Konvertieren in Stunden:Minuten:Sekunden Format
+    hours = mttr_seconds // 3600
+    minutes = (mttr_seconds % 3600) // 60
+    seconds = mttr_seconds % 60
+
+    mttr_str = f"{int(hours)}h {int(minutes)}m {int(seconds)}s"
+    # Hier endet die MTTR-Berechnung
+
+    # Konvertieren der Daten in ein serialisierbares Format
+    mttr_data_list = [
+        {
+            'starttime': incident.start_time.strftime('%H:%M %d.%m.%Y'),
+            'endtime': incident.end_time.strftime('%H:%M %d.%m.%Y'),
+            'description': incident.description,
+            'project': incident.projekt.name
+        }
+        for incident in incidents
+    ]
+    
+    # MTTR in das Antwortobjekt aufnehmen
+    response = {
+        'mttr': mttr_str,
+        'data': mttr_data_list
+    }
+
+    return jsonify(response)
+
+@app.route('/get_cfr_data')
+def get_cfr_data():
+    project_id = request.args.get('project_id', 'all')
+    if project_id == 'all':
+        failed_deployments = LTC.query.filter_by(deployment_successful=False).count()
+        total_deployments = LTC.query.count()
+    else:
+        failed_deployments = LTC.query.filter_by(deployment_successful=False, projekt_id=project_id).count()
+        total_deployments = LTC.query.filter_by(projekt_id=project_id).count()
+
+    if total_deployments != 0:
+        cfr = (failed_deployments / total_deployments) * 100
+    else:
+        cfr = 0
+
+    return jsonify({'cfr': cfr, 'failed': failed_deployments, 'total': total_deployments})
 
 
 @app.route("/submit_ccv", methods=["POST"])
@@ -227,7 +337,7 @@ def update_ltc(ltc_id):
     # Nach dem Update zur Startseite oder einer anderen geeigneten Seite weiterleiten
     return redirect(url_for("start_page"))
 
-
+#kann gelöscht werden
 @app.route("/calculate_mttr", methods=["GET"])
 @login_required
 def calculate_mttr(project_id=None):
@@ -304,6 +414,9 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 def calculate_deployment_frequency(project_id=None):
     if project_id and project_id != 'all':
