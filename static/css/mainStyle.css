@@ -1,0 +1,41 @@
+.container-fluid{
+    background: linear-gradient(-35deg, #071422 25%, #216b73 100%); 
+}
+
+.navbar-brand{
+    color: #ffffff;
+}
+p
+{
+    color: #ffffff;
+}   
+
+.PandoraLogo{
+    max-height: 85px;
+    margin-right: 5px;
+}
+.reiterMenu{
+    flex-wrap: nowrap;
+}
+
+.LogoTitel{
+    margin-right: 1rem;
+}
+
+.nav-pills .nav-link {
+   
+    color: white;
+    width: 100px;
+    Text-align: center;
+}
+
+/* Farbe beim Hover */
+.nav-pills .nav-link:hover {
+    background-color: #0056b3; /* Dunkleres Blau */
+}
+
+/* Aktive nav-pill */
+.nav-pills .nav-link.active {
+    background-color: rgba(21, 197, 226, 0.77);
+    color: #ffffff;
+}

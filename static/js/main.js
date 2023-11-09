@@ -177,6 +177,7 @@ document.getElementById('fetch_project_data').addEventListener('click', function
         fetch('/get_ltc_data?project_id=' + projectId).then(response => response.json()),
         fetch('/get_mttr_data?project_id=' + projectId).then(response => response.json()),
         fetch('/get_cfr_data?project_id=' + projectId).then(response => response.json()),
+        fetch('/get_df_data?project_id=' + projectId).then(response => response.json()),
         // ... fügen   hier weitere fetch Aufrufe für andere Datenquellen hinzu
     ])
     .then(alldata => {
@@ -190,6 +191,8 @@ document.getElementById('fetch_project_data').addEventListener('click', function
         updateMTTRTable(alldata[2].data);
         updateMTTRDisplay(alldata[2].mttr);
         updateCFRDisplay(alldata[3]); // Ihre neue Funktion, um die CFR anzuzeigen
+        updateDFChart(alldata[4]);
+        document.getElementById('dfValue').textContent = alldata[4].df; 
         // ... weitere Funktionen, um andere Tabellen zu aktualisieren
 
         // Nach dem Aktualisieren der Tabellen rufen   updateCharts erneut auf
@@ -252,6 +255,51 @@ function updateCFRDisplay(cfrData) {
     document.getElementById('total').innerText = cfrData.total;
     document.getElementById('cfrDisplay').innerText = cfrData.cfr.toFixed(2) + '%'; // Formatieren auf 2 Dezimalstellen
 }
+
+function updateDFChart(dfData) {
+    if (window.myBarChart) {
+      window.myBarChart.data.labels = dfData.months;
+      window.myBarChart.data.datasets.forEach((dataset) => {
+        dataset.data = dfData.deployments;
+        
+      });
+      window.myBarChart.update();
+    } else {
+      // Hier könnten Sie Ihr Diagramm initialisieren, wenn es noch nicht existiert
+      var ctx = document.getElementById('myBarChart').getContext('2d');
+      window.myBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: dfData.months,
+          datasets: [{
+            label: 'Deployments pro Monat',
+            data: dfData.deployments,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true
+              }
+            }]
+          },
+          responsive: true,
+          legend: {
+            position: 'top',
+          },
+          animation:{
+            duration: 1000, // Dauer in Millisekunden
+            easing: 'easeOutBounce' 
+          }
+        }
+      });
+    }
+  }
+  
   
 // Verhindert das Absenden des Formulars wenn kein Projekt ausgewählt ist
 //wirkt nur auf das erste formular muss noch angepasst werden auf eine spezifische id!!!
@@ -332,8 +380,13 @@ myBarChart = new Chart(ctx, {
         responsive: true,
         legend: {
             position: 'top',
+        },
+        animation:{
+          duration: 1000, // Dauer in Millisekunden
+          easing: 'easeOutBounce' 
         }
     }
 });
 
 }
+

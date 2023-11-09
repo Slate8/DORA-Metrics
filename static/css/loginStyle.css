@@ -3,12 +3,13 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f4f7f6; 
+    background: linear-gradient(-35deg, #071422 45%, #216b73 100%);
     font-family: Arial, sans-serif;
 }
 .login-container {
     text-align: left;
     max-width: 350px; 
+    color: white;
 }
 .login-form input[type="text"],
 .login-form input[type="password"] {
@@ -43,7 +44,7 @@ body {
 }
 
 .logo {
-    width: 75px;
+    width: 120px;
     height: auto;
     position: relative;
     left: -20px; /* Bewegt das Logo 20px näher an den Text. Negative Werte bewegen es nach links. */

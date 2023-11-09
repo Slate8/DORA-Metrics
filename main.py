@@ -38,6 +38,8 @@ from models import User, CD_METRIK, Projekt, Incident, LTC
 from sqlalchemy.orm import joinedload
 
 
+
+
 app = Flask(__name__, template_folder="templates")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.db'
@@ -206,6 +208,12 @@ def get_cfr_data():
 
     return jsonify({'cfr': cfr, 'failed': failed_deployments, 'total': total_deployments})
 
+@app.route('/get_df_data')
+def get_df_data():
+    project_id = request.args.get('project_id', 'all')
+    df_data = calculate_deployment_frequency(project_id)
+    months, monthly_deployments = get_monthly_deployments(project_id)
+    return jsonify(df=df_data, months=months, deployments=monthly_deployments)
 
 @app.route("/submit_ccv", methods=["POST"])
 @login_required
@@ -418,16 +426,39 @@ def logout():
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
 def calculate_deployment_frequency(project_id=None):
-    if project_id and project_id != 'all':
-        deployments = LTC.query.filter_by(projekt_id=project_id).count()
+    # Initialisiere die Anzahl der aktiven Monate
+    active_months = 0
+    total_deployments = 0
+
+    for month in range(1, 13):  # Für jeden Monat des Jahres
+        if project_id and project_id != 'all':
+            # Zählt die Deployments für den gegebenen Monat und das spezifische Projekt
+            monthly_deployments = LTC.query.filter(
+                extract('month', LTC.deployment_datetime) == month,
+                LTC.projekt_id == project_id
+            ).count()
+        else:
+            # Zählt die Deployments für den gegebenen Monat über alle Projekte
+            monthly_deployments = LTC.query.filter(
+                extract('month', LTC.deployment_datetime) == month
+            ).count()
+        
+        # Wenn in dem Monat Deployments stattgefunden haben, erhöhe die Zähler
+        if monthly_deployments > 0:
+            active_months += 1
+            total_deployments += monthly_deployments
+
+    # Berechnung der Deployment-Frequenz
+    if active_months > 0:  # Vermeidung der Division durch Null
+        deployment_frequency = total_deployments / active_months
     else:
-        # Zählt alle Deployments in der LTC-Tabelle
-        deployments = LTC.query.count()
+        deployment_frequency = 0
 
-    return deployments
+    return deployment_frequency
 
-
+#Funktion für die Darstellung im DF-Chart
 def get_monthly_deployments(project_id=None):
     months = ["Januar", "Februar", "März", "April", "Mai", "Juni",
               "Juli", "August", "September", "Oktober", "November", "Dezember"]
@@ -443,6 +474,26 @@ def get_monthly_deployments(project_id=None):
         monthly_deployments.append(count)
 
     return months, monthly_deployments
+
+
+@app.route('/create_project', methods=['POST'])
+def create_project():
+    name = request.form['name']
+    description = request.form.get('description', '')  # 'description' ist optional
+
+    try:
+        # Direktes Hinzufügen eines Projekts in der Datenbank
+        with app.app_context():
+            project = Projekt(name=name, description=description)
+            db.session.add(project)
+            db.session.commit()
+
+        return redirect(url_for("start_page"))
+
+    except Exception as e:
+        app.logger.error(f'Fehler beim Erstellen des Projekts: {e}')
+        return jsonify({'error': str(e)}), 500
+
 
 
 if __name__ == "__main__":

@@ -1,32 +1,34 @@
 # Summary
 
-Date : 2023-10-23 13:23:42
+Date : 2023-11-08 08:47:13
 
 Directory /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics
 
-Total : 22 files,  928 codes, 234 comments, 288 blanks, all 1450 lines
+Total : 27 files,  1427 codes, 333 comments, 387 blanks, all 2147 lines
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Python | 17 | 519 | 204 | 197 | 920 |
-| HTML | 2 | 243 | 17 | 42 | 302 |
-| JavaScript | 1 | 114 | 13 | 25 | 152 |
+| Python | 20 | 706 | 251 | 251 | 1,208 |
+| HTML | 3 | 382 | 27 | 63 | 472 |
+| JavaScript | 1 | 239 | 55 | 45 | 339 |
+| CSS | 1 | 48 | 0 | 4 | 52 |
 | Ini | 1 | 38 | 0 | 13 | 51 |
 | Markdown | 1 | 14 | 0 | 11 | 25 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 22 | 928 | 234 | 288 | 1,450 |
-| . (Files) | 7 | 298 | 50 | 100 | 448 |
-| migrations | 12 | 273 | 154 | 121 | 548 |
+| . | 27 | 1,427 | 333 | 387 | 2,147 |
+| . (Files) | 8 | 457 | 73 | 136 | 666 |
+| migrations | 14 | 301 | 178 | 139 | 618 |
 | migrations (Files) | 2 | 92 | 34 | 39 | 165 |
-| migrations/versions | 10 | 181 | 120 | 82 | 383 |
-| static | 1 | 114 | 13 | 25 | 152 |
-| static/js | 1 | 114 | 13 | 25 | 152 |
-| templates | 2 | 243 | 17 | 42 | 302 |
+| migrations/versions | 12 | 209 | 144 | 100 | 453 |
+| static | 2 | 287 | 55 | 49 | 391 |
+| static/css | 1 | 48 | 0 | 4 | 52 |
+| static/js | 1 | 239 | 55 | 45 | 339 |
+| templates | 3 | 382 | 27 | 63 | 472 |
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
