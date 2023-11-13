@@ -50,3 +50,21 @@ body {
     left: -20px; /* Bewegt das Logo 20px näher an den Text. Negative Werte bewegen es nach links. */
 }
 
+@media only screen and (max-width: 1079px) {
+    .login-header {
+        flex-flow: unset;
+        }
+
+}
+
+
+@media only screen and (max-width: 844px) {
+.login-header {
+    flex-flow: column-reverse;
+    }
+
+    .logo {
+        width: 200px;
+        left: unset;
+        }
+}

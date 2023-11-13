@@ -38,8 +38,6 @@ from models import User, CD_METRIK, Projekt, Incident, LTC
 from sqlalchemy.orm import joinedload
 
 
-
-
 app = Flask(__name__, template_folder="templates")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.db'
@@ -53,6 +51,7 @@ migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.init_app(app)
+
 
 @app.route("/")
 @login_required
@@ -98,19 +97,20 @@ def start_page():
     return render_template('index.html', ccv_data=ccv_data, mttr=mttr_data, projects=projects,
                            ltc_data=ltc_data, current_project_id=project_id, df=df_data, months=months,
                            monthly_deployments=monthly_deployments, failed=failed_deployments,
-                           total=total_deployments, cfr=cfr,incident_data=incident_data)
+                           total=total_deployments, cfr=cfr, incident_data=incident_data)
 
 
-
-#mit AJAX Anpassung
+# mit AJAX Anpassung
 @app.route('/get_cd_metric_data')
 def get_cd_metric_data():
     project_id = request.args.get('project_id', 'all')
     if project_id == 'all':
-        metrics_data = CD_METRIK.query.options(joinedload(CD_METRIK.user)).all()
+        metrics_data = CD_METRIK.query.options(
+            joinedload(CD_METRIK.user)).all()
     else:
-        metrics_data = CD_METRIK.query.options(joinedload(CD_METRIK.user)).filter_by(projekt_id=project_id).all()
-    
+        metrics_data = CD_METRIK.query.options(joinedload(
+            CD_METRIK.user)).filter_by(projekt_id=project_id).all()
+
     # Konvertieren der Daten in ein serialisierbares Format
     metrics_data_list = [
         {
@@ -120,14 +120,15 @@ def get_cd_metric_data():
             'timestamp': metric.timestamp.strftime('%H:%M %d.%m.%Y'),
             'code_change_volume': metric.code_change_volume,
             'user_id': metric.user_id,
-            'user': metric.user.username,  
+            'user': metric.user.username,
             'projekt_id': metric.projekt_id,
             'projekt': metric.projekt.name if metric.projekt else None
         }
         for metric in metrics_data
     ]
-    
+
     return jsonify(metrics_data_list)
+
 
 @app.route('/get_ltc_data')
 def get_ltc_data():
@@ -136,21 +137,22 @@ def get_ltc_data():
         ltc_data = LTC.query.all()
     else:
         ltc_data = LTC.query.filter_by(projekt_id=project_id).all()
-    
+
     # Konvertieren der Daten in ein serialisierbares Format
     ltc_data_list = [
         {
             'id': data.id,
             'ltc_value': f'{data.value:.2f}',
-            'commit':data.commit_datetime.strftime('%H:%M %d.%m.%Y'),
-            'deploy':data.deployment_datetime.strftime('%H:%M %d.%m.%Y'),
-            'user':data.user.username,
+            'commit': data.commit_datetime.strftime('%H:%M %d.%m.%Y'),
+            'deploy': data.deployment_datetime.strftime('%H:%M %d.%m.%Y'),
+            'user': data.user.username,
             'deploy_successful': str(data.deployment_successful)
-                   }
+        }
         for data in ltc_data
     ]
-    
+
     return jsonify(ltc_data_list)
+
 
 @app.route('/get_mttr_data')
 def get_mttr_data():
@@ -159,9 +161,10 @@ def get_mttr_data():
         incidents = Incident.query.all()
     else:
         incidents = Incident.query.filter_by(projekt_id=project_id).all()
-    
+
    # Hier beginnt die MTTR-Berechnung
-    total_duration = sum((incident.end_time - incident.start_time).total_seconds() for incident in incidents)
+    total_duration = sum(
+        (incident.end_time - incident.start_time).total_seconds() for incident in incidents)
     mttr_seconds = total_duration / len(incidents) if incidents else 0
 
     # Konvertieren in Stunden:Minuten:Sekunden Format
@@ -182,7 +185,7 @@ def get_mttr_data():
         }
         for incident in incidents
     ]
-    
+
     # MTTR in das Antwortobjekt aufnehmen
     response = {
         'mttr': mttr_str,
@@ -191,14 +194,17 @@ def get_mttr_data():
 
     return jsonify(response)
 
+
 @app.route('/get_cfr_data')
 def get_cfr_data():
     project_id = request.args.get('project_id', 'all')
     if project_id == 'all':
-        failed_deployments = LTC.query.filter_by(deployment_successful=False).count()
+        failed_deployments = LTC.query.filter_by(
+            deployment_successful=False).count()
         total_deployments = LTC.query.count()
     else:
-        failed_deployments = LTC.query.filter_by(deployment_successful=False, projekt_id=project_id).count()
+        failed_deployments = LTC.query.filter_by(
+            deployment_successful=False, projekt_id=project_id).count()
         total_deployments = LTC.query.filter_by(projekt_id=project_id).count()
 
     if total_deployments != 0:
@@ -208,12 +214,14 @@ def get_cfr_data():
 
     return jsonify({'cfr': cfr, 'failed': failed_deployments, 'total': total_deployments})
 
+
 @app.route('/get_df_data')
 def get_df_data():
     project_id = request.args.get('project_id', 'all')
     df_data = calculate_deployment_frequency(project_id)
     months, monthly_deployments = get_monthly_deployments(project_id)
     return jsonify(df=df_data, months=months, deployments=monthly_deployments)
+
 
 @app.route("/submit_ccv", methods=["POST"])
 @login_required
@@ -345,7 +353,39 @@ def update_ltc(ltc_id):
     # Nach dem Update zur Startseite oder einer anderen geeigneten Seite weiterleiten
     return redirect(url_for("start_page"))
 
-#kann gelöscht werden
+@app.route("/edit_ccv/<int:ccv_id>", methods=["GET"])
+@login_required
+def edit_ccv(ccv_id):
+    # Holt den LTC-Eintrag aus der Datenbank
+    metric = CD_METRIK.query.get_or_404(ccv_id)
+
+    # Stellt sicher, dass der aktuelle Benutzer berechtigt ist, diesen Eintrag zu bearbeiten
+   ## if metric.user_id != current_user.id:
+   ##     abort(403)  # Forbidden
+
+    projects = Projekt.query.all()
+    return render_template('edit_ccv.html', metric=metric, projects=projects)
+
+
+@app.route('/update_ccv/<int:ccv_id>', methods=['POST'])
+@login_required
+def update_ccv(ccv_id):
+    metric = CD_METRIK.query.get_or_404(ccv_id)
+
+  ##  if metric.user_id != current_user.id:
+   ##     abort(403)
+
+    metric.timestamp = datetime.fromisoformat(request.form['timestamp'])
+    metric.code_change_volume = request.form['ccvValue']
+    # Aktualisieren Sie hier weitere Felder wie Benutzer- und Projektinformationen, falls nötig
+
+    db.session.commit()
+    return redirect(url_for('start_page'))
+
+
+
+
+
 @app.route("/calculate_mttr", methods=["GET"])
 @login_required
 def calculate_mttr(project_id=None):
@@ -422,6 +462,7 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -444,7 +485,7 @@ def calculate_deployment_frequency(project_id=None):
             monthly_deployments = LTC.query.filter(
                 extract('month', LTC.deployment_datetime) == month
             ).count()
-        
+
         # Wenn in dem Monat Deployments stattgefunden haben, erhöhe die Zähler
         if monthly_deployments > 0:
             active_months += 1
@@ -458,7 +499,9 @@ def calculate_deployment_frequency(project_id=None):
 
     return deployment_frequency
 
-#Funktion für die Darstellung im DF-Chart
+# Funktion für die Darstellung im DF-Chart
+
+
 def get_monthly_deployments(project_id=None):
     months = ["Januar", "Februar", "März", "April", "Mai", "Juni",
               "Juli", "August", "September", "Oktober", "November", "Dezember"]
@@ -479,21 +522,22 @@ def get_monthly_deployments(project_id=None):
 @app.route('/create_project', methods=['POST'])
 def create_project():
     name = request.form['name']
-    description = request.form.get('description', '')  # 'description' ist optional
+    description = request.form.get('description', '')
+
+    existing_project = Projekt.query.filter_by(name=name).first()
+    if existing_project:
+        return jsonify({'success': False, 'message': 'Ein Projekt mit diesem Namen existiert bereits.'}), 400
 
     try:
-        # Direktes Hinzufügen eines Projekts in der Datenbank
         with app.app_context():
             project = Projekt(name=name, description=description)
             db.session.add(project)
             db.session.commit()
-
-        return redirect(url_for("start_page"))
+        return jsonify({'success': True, 'message': 'Projekt erfolgreich erstellt!'})
 
     except Exception as e:
         app.logger.error(f'Fehler beim Erstellen des Projekts: {e}')
-        return jsonify({'error': str(e)}), 500
-
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 
 if __name__ == "__main__":

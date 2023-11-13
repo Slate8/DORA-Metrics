@@ -1,8 +1,8 @@
 var myBarChart;
 const predefinedColors = [
-    '#FFCD56', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+    '#216b73', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
     '#FF6384', '#C45850', '#A2CC3A', '#EB3D57', '#FF8A65', '#66BB6A'
-    
+
 ];
 
 const userColorMap = {}; // Ein Objekt zum Speichern der Farben für jeden Benutzernamen
@@ -135,39 +135,7 @@ function updateCharts() {
 updateCharts();
 updateBarChart();
 
-/*
-document.getElementById('fetch_project_data').addEventListener('click', function () {
-    var projectId = document.getElementById('projectSelector').value;
-    window.location.href = '/?project_id=' + projectId;
-    updateBarChart();
-});
-*/
 
-/*
-document.getElementById('fetch_project_data').addEventListener('click', function () {
-    var projectId = document.getElementById('projectSelector').value;
-    fetch('/get_cd_metric_data?project_id=' + projectId) // Pfad muss Ihrem Backend-Endpoint entsprechen
-        .then(response => response.json())
-        .then(data => {
-            // Aktualisieren   die Tabelle mit neuen Daten
-            var tbody = document.getElementById('ccvDataBody');
-            tbody.innerHTML = ''; // Löschen   den vorhandenen Tabelleninhalt
-            // Erstellen   neue Tabellenzeilen mit den abgerufenen Daten
-            data.forEach(metric => {
-                var row = tbody.insertRow();
-                row.innerHTML = `<td class="text-center">${metric.timestamp}</td>
-                                 <td class="text-center">${metric.code_change_volume}</td>
-                                 <td class="text-center">${metric.user}</td>
-                                 <td class="text-center">${metric.projekt}</td>`;
-            });
-
-            // Nach dem Aktualisieren der Tabelle müssen   updateCharts erneut aufrufen
-            updateCharts();
-   
-        })
-        .catch(error => console.error('Fehler beim Abrufen der Daten:', error));
-});
-*/
 
 document.getElementById('fetch_project_data').addEventListener('click', function () {
     var projectId = document.getElementById('projectSelector').value;
@@ -180,25 +148,26 @@ document.getElementById('fetch_project_data').addEventListener('click', function
         fetch('/get_df_data?project_id=' + projectId).then(response => response.json()),
         // ... fügen   hier weitere fetch Aufrufe für andere Datenquellen hinzu
     ])
-    .then(alldata => {
-        // alldata[0] enthält die Antwort von '/get_cd_metric_data'
-        // alldata[1] enthält die Antwort von '/get_ltc_data'
-        // ... und so weiter für weitere Antworten
+        .then(alldata => {
+            // alldata[0] enthält die Antwort von '/get_cd_metric_data'
+            // alldata[1] enthält die Antwort von '/get_ltc_data'
+            // ... und so weiter für weitere Antworten
 
-        // Aktualisieren   hier die Tabellen mit den Daten von alldata
-        updateCCVTable(alldata[0]); // Eine hypothetische Funktion, um die CCV-Tabelle zu aktualisieren
-        updateLTCTable(alldata[1]); // Eine hypothetische Funktion, um die LTC-Tabelle zu aktualisieren
-        updateMTTRTable(alldata[2].data);
-        updateMTTRDisplay(alldata[2].mttr);
-        updateCFRDisplay(alldata[3]); // Ihre neue Funktion, um die CFR anzuzeigen
-        updateDFChart(alldata[4]);
-        document.getElementById('dfValue').textContent = alldata[4].df; 
-        // ... weitere Funktionen, um andere Tabellen zu aktualisieren
+            // Aktualisieren   hier die Tabellen mit den Daten von alldata
+            updateCCVTable(alldata[0]); // Eine  Funktion, um die CCV-Tabelle zu aktualisieren
+            updateLTCTable(alldata[1]); // Eine  Funktion, um die LTC-Tabelle zu aktualisieren
+            updateMTTRTable(alldata[2].data);
+            updateMTTRValue(alldata[2].mttr);
+            updateMTTRDisplay(alldata[2].data);
+            updateCFRDisplay(alldata[3]); // Ihre neue Funktion, um die CFR anzuzeigen
+            updateDFChart(alldata[4]);
+            document.getElementById('dfValue').textContent = alldata[4].df;
+            // ... weitere Funktionen, um andere Tabellen zu aktualisieren
 
-        // Nach dem Aktualisieren der Tabellen rufen   updateCharts erneut auf
-        updateCharts();
-    })
-    .catch(error => console.error('Fehler beim Abrufen der Daten:', error));
+            // Nach dem Aktualisieren der Tabellen rufen   updateCharts erneut auf
+            updateCharts();
+        })
+        .catch(error => console.error('Fehler beim Abrufen der Daten:', error));
 });
 
 // Beispiel Funktion, um die CCV Tabelle zu aktualisieren
@@ -211,7 +180,13 @@ function updateCCVTable(data) {
         row.innerHTML = `<td class="text-center">${metric.timestamp}</td>
                          <td class="text-center">${metric.code_change_volume}</td>
                          <td class="text-center">${metric.user}</td>
-                         <td class="text-center">${metric.projekt}</td>`;
+                         <td class="text-center">${metric.projekt}</td>
+                         <td class="text-center">
+                         <a href="/edit_ccv/${metric.id}">
+                             <i class="fas fa-cog"></i>
+                         </a>
+                     </td>`
+                         ;
     });
 }
 function updateLTCTable(data) {
@@ -241,14 +216,105 @@ function updateMTTRTable(data) {
                          <td class="text-center">${metric.endtime}</td>
                          <td class="text-center">${metric.description}</td>
                          <td class="text-center">${metric.project}</td>`;
-                         
+
     });
-    
+
 }
-function updateMTTRDisplay(mttr) {
+function updateMTTRValue(mttr) {
     var mttrDisplay = document.getElementById('mttrDisplay');
     mttrDisplay.innerText = mttr; // Nur der Wert von MTTR wird hier aktualisiert
+    
 }
+
+let mttrChart; // Globale Variable, um die Chart-Instanz zu speichern
+
+function updateMTTRDisplay(mttrData) {
+  
+
+    const ctx = document.getElementById('mttrChart').getContext('2d');
+    const projectNames = [...new Set(mttrData.map(incident => incident.project))];
+    const labels = [...new Set(mttrData.map(incident => incident.starttime))];
+
+    // Initialisiere die Datenstruktur für jedes Projekt mit Nullen
+    const projectData = projectNames.reduce((acc, projectName) => {
+        acc[projectName] = labels.map(() => null); // Starte mit null für jede Zeitmarke
+        return acc;
+    }, {});
+
+    // Fülle die tatsächlichen Daten für jedes Projekt
+    mttrData.forEach(incident => {
+        const projectName = incident.project;
+        const labelIndex = labels.indexOf(incident.starttime);
+        const start = parseDate(incident.starttime);
+        const end = parseDate(incident.endtime);
+        const duration = (end - start) / 1000 / 3600; // Dauer in Stunden
+        projectData[projectName][labelIndex] = parseFloat(duration.toFixed(2));
+    });
+
+    // Erstelle ein Dataset für jedes Projekt
+    const datasets = projectNames.map((projectName, index) => {
+        const color = predefinedColors[index % predefinedColors.length];
+        return {
+            label: projectName,
+            data: projectData[projectName],
+            backgroundColor: color,
+            borderColor: color,
+            borderWidth: 1
+        };
+    });
+
+    // Erstelle oder aktualisiere das Diagramm
+    if (mttrChart) {
+        mttrChart.data.labels = labels;
+        mttrChart.data.datasets = datasets;
+        mttrChart.options.plugins.title.text = `MTTR`;
+        mttrChart.update();
+    } else {
+        mttrChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Dauer (Stunden)'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `MTTR`
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Verwendet beim Laden der Seite und auch wenn neue Daten abgerufen werden
+document.getElementById('fetch_project_data').addEventListener('click', function () {
+    const projectId = document.getElementById('projectSelector').value;
+    fetch('/get_mttr_data?project_id=' + projectId)
+        .then(response => response.json())
+        .then(data => {
+            updateMTTRDisplay(data.data); // Übergebe die Daten direkt an die Funktion
+        })
+        .catch(error => {
+            console.error('Fehler beim Abrufen der MTTR-Daten:', error);
+        });
+});
+
+
+
+
 
 function updateCFRDisplay(cfrData) {
     document.getElementById('failed').innerText = cfrData.failed;
@@ -257,50 +323,52 @@ function updateCFRDisplay(cfrData) {
 }
 
 function updateDFChart(dfData) {
+    
+
     if (window.myBarChart) {
-      window.myBarChart.data.labels = dfData.months;
-      window.myBarChart.data.datasets.forEach((dataset) => {
-        dataset.data = dfData.deployments;
-        
-      });
-      window.myBarChart.update();
+        window.myBarChart.data.labels = dfData.months;
+        window.myBarChart.data.datasets.forEach((dataset) => {
+            dataset.data = dfData.deployments;
+
+        });
+        window.myBarChart.update();
     } else {
-      // Hier könnten Sie Ihr Diagramm initialisieren, wenn es noch nicht existiert
-      var ctx = document.getElementById('myBarChart').getContext('2d');
-      window.myBarChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: dfData.months,
-          datasets: [{
-            label: 'Deployments pro Monat',
-            data: dfData.deployments,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              }
-            }]
-          },
-          responsive: true,
-          legend: {
-            position: 'top',
-          },
-          animation:{
-            duration: 1000, // Dauer in Millisekunden
-            easing: 'easeOutBounce' 
-          }
-        }
-      });
+        // Hier könnten Sie Ihr Diagramm initialisieren, wenn es noch nicht existiert
+        var ctx = document.getElementById('myBarChart').getContext('2d');
+        window.myBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: dfData.months,
+                datasets: [{
+                    label: 'Deployments pro Monat',
+                    data: dfData.deployments,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                responsive: true,
+                legend: {
+                    position: 'top',
+                },
+                animation: {
+                    duration: 1000, // Dauer in Millisekunden
+                    easing: 'easeOutBounce'
+                }
+            }
+        });
     }
-  }
-  
-  
+}
+
+
 // Verhindert das Absenden des Formulars wenn kein Projekt ausgewählt ist
 //wirkt nur auf das erste formular muss noch angepasst werden auf eine spezifische id!!!
 document.getElementById("ccvForm").addEventListener("submit", function (event) {
@@ -315,15 +383,10 @@ document.getElementById("ccvForm").addEventListener("submit", function (event) {
     if (!ccvValue) {
         alert("Bitte geben   Ihren CCV-Wert ein!");
         event.preventDefault();
-        
+
     }
 });
-/*
-document.getElementById("submit_ccv").addEventListener("submit", function(event) {
-    const projectId = document.getElementById("projectSelector").value;
-    document.getElementById("hiddenProjectId").value = projectId;
-});
-*/
+
 
 document.getElementById("ltcForm").addEventListener("submit", function (event) {
     let selectedProject = document.getElementById("ltcprojectSelector").value;
@@ -345,48 +408,243 @@ document.getElementById("ltcForm").addEventListener("submit", function (event) {
 });
 
 function updateBarChart() {
+    // Daten aus den data-* Attributen lesen
+    const chartDataElement = document.getElementById('chartData');
+    const months = JSON.parse(chartDataElement.getAttribute('data-months'));
+    const monthlyDeploymentsRaw = JSON.parse(chartDataElement.getAttribute('data-deployments'));
+    const monthlyDeployments = monthlyDeploymentsRaw.map(value => (value === null || value === 0) ? 0 : value);
 
-// Daten aus den data-* Attributen lesen
-const chartDataElement = document.getElementById('chartData');
-const months = JSON.parse(chartDataElement.getAttribute('data-months'));
-const monthlyDeploymentsRaw = JSON.parse(chartDataElement.getAttribute('data-deployments'));
-const monthlyDeployments = monthlyDeploymentsRaw.map(value => (value === null || value === 0) ? 0 : value);
+    // Ensure predefinedColors is defined and accessible here
+    const predefinedColors = ['#FF6384', '#36A2EB', '#FFCE56'];
 
-if (myBarChart) {
-    myBarChart.destroy();
-}
+    // Generate the background and border color arrays for each bar
+    const backgroundColors = monthlyDeployments.map((_, index) => predefinedColors[index % predefinedColors.length]);
+    const borderColors = backgroundColors;
 
-var ctx = document.getElementById('myBarChart').getContext('2d');
-myBarChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: months,
-        datasets: [{
-            label: 'Deployments pro Monat',
-            data: monthlyDeployments,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true
-                }
+    // Destroy the existing chart if it exists
+    if (window.myBarChart) {
+        window.myBarChart.destroy();
+    }
+
+    var ctx = document.getElementById('myBarChart').getContext('2d');
+    window.myBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Deployments pro Monat',
+                data: monthlyDeployments,
+                backgroundColor: '#216b73',
+                borderColor: '#216b73',
+                borderWidth: 1
             }]
         },
-        responsive: true,
-        legend: {
-            position: 'top',
-        },
-        animation:{
-          duration: 1000, // Dauer in Millisekunden
-          easing: 'easeOutBounce' 
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            responsive: true,
+            legend: {
+                position: 'top',
+            },
+            animation: {
+                duration: 1000, // Dauer in Millisekunden
+                easing: 'easeOutBounce'
+            }
         }
-    }
-});
-
+    });
 }
 
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    var newProjectForm = document.getElementById('newProjectForm');
+
+    newProjectForm.addEventListener('submit', function (event) {
+        event.preventDefault(); // Verhindert das normale Senden des Formulars
+
+        var formData = new FormData(this);
+
+        fetch('/create_project', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayMessage(data.message, 'success'); // Erfolgsmeldung
+                    $('#createProjectModal').modal('hide'); // Schließt das Modal
+
+                } else {
+                    displayMessage(data.message, 'error'); // Fehlermeldung
+                }
+            })
+            .catch(error => {
+                console.error('Fehler beim Senden des Formulars:', error);
+                displayMessage('Ein Fehler ist aufgetreten', 'error');
+            });
+    });
+});
+
+function displayMessage(message, type) {
+    var messageBox = document.createElement('div');
+    messageBox.textContent = message;
+    messageBox.className = type === 'success' ? 'alert alert-success' : 'alert alert-danger';
+    messageBox.style.position = 'fixed';
+    messageBox.style.bottom = '20px';
+    messageBox.style.right = '20px';
+    messageBox.style.zIndex = '1000';
+
+    document.body.appendChild(messageBox);
+
+    // Meldung nach ein paar Sekunden ausblenden
+    setTimeout(function () {
+        messageBox.remove();
+    }, 3000);
+}
+
+function parseDate(dateStr) {
+    // Zerlegen des Strings in seine Bestandteile
+    const [time, date] = dateStr.split(' ');
+    const [hours, minutes] = time.split(':').map(part => parseInt(part, 10));
+    const [day, month, year] = date.split('.').map(part => parseInt(part, 10));
+
+    // Erstellen eines neuen Date-Objekts
+    // Beachten Sie, dass Monate in JavaScript von 0 bis 11 gezählt werden, daher -1 für den Monat
+    return new Date(year, month - 1, day, hours, minutes);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    fetch('/get_mttr_data')
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('mttrChart').getContext('2d');
+            const projectNames = [...new Set(data.data.map(incident => incident.project))];
+            const labels = [...new Set(data.data.map(incident => incident.starttime))];
+
+            // Initialisieren Sie die Datenstruktur für jedes Projekt mit Nullen
+            const projectData = projectNames.reduce((acc, projectName) => {
+                acc[projectName] = labels.map(() => null); // Starten mit null für jede Zeitmarke
+                return acc;
+            }, {});
+
+            // Füllen Sie die tatsächlichen Daten für jedes Projekt
+            data.data.forEach(incident => {
+                const projectName = incident.project;
+                const labelIndex = labels.indexOf(incident.starttime);
+                const start = parseDate(incident.starttime);
+                const end = parseDate(incident.endtime);
+                const duration = (end - start) / 1000 / 3600;
+                projectData[projectName][labelIndex] = parseFloat(duration.toFixed(2));
+            });
+
+            // Erstellen eines Datasets für jedes Projekt
+            const datasets = projectNames.map((projectName, index) => {
+                const color = predefinedColors[index % predefinedColors.length];
+                return {
+                    label: projectName,
+                    data: projectData[projectName],
+                    // Hier können Sie Farben dynamisch zuweisen, je nach Anzahl der Projekte
+                    backgroundColor: color, // Beispiel für eine Farbe
+                    borderColor: color, // Beispiel für eine Farbe
+                    borderWidth: 1
+                };
+            });
+
+            // Erstellen des Diagramms
+            const mttrChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels, // Verwenden Sie die generierten Labels
+                    datasets: datasets
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Dauer (Stunden)'
+                            }
+                        }
+                    },
+                    plugins: {
+
+                        title: {
+                            display: true,
+                            text: `MTTR: ${data.mttr}`
+                        }
+                    }
+                }
+            });
+        });
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    fetch('/get_mttr_data')
+        .then(response => response.json())
+        .then(data => {
+            // Aggregieren der MTTR-Daten für jedes Projekt
+            const mttrByProject = {};
+            data.data.forEach(incident => {
+                const projectName = incident.project;
+                const start = new Date(parseDate(incident.starttime));
+                const end = new Date(parseDate(incident.endtime));
+
+                const duration = (end - start) / 1000 / 60; // Dauer in Minuten
+                if (mttrByProject[projectName]) {
+                    mttrByProject[projectName] += duration;
+                } else {
+                    mttrByProject[projectName] = duration;
+                }
+            });
+
+            // Definiere ein Array von Farben
+            const colors = predefinedColors;
+            const backgroundColors = Object.keys(mttrByProject).map((_, index) => colors[index % colors.length]);
+
+            // Erstellen der Datenstruktur für das Chart.js-Diagramm
+            const mttrData = {
+                labels: Object.keys(mttrByProject),
+                datasets: [{
+                    label: 'MTTR in Minuten',
+                    data: Object.values(mttrByProject),
+                    backgroundColor: backgroundColors, // Verwende das Farb-Array für Hintergrundfarben
+                    borderColor: backgroundColors, // Verwende das Farb-Array für Randfarben
+                    borderWidth: 1
+                }]
+            };
+
+            // Erstellen des Doughnut-Charts
+            const ctx = document.getElementById('mttrRingChart').getContext('2d');
+            const mttrRingChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: mttrData,
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'MTTR für Projekte (in Minuten)'
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Fehler beim Abrufen der MTTR-Daten', error));
+});

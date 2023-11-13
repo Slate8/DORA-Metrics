@@ -10,23 +10,25 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <title>Metriken-Übersicht</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/mainStyle.css') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/BrowserIconPandora.png">
 
 </head>
 
 <body>
 
-    
+
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <!-- Logo und Titel -->
             <div class="d-flex align-items-center LogoTitel">
                 <a class="navbar-brand" href="/">
-                    <img class="PandoraLogo" src="/static/images/NewPandoraLogo.png" alt="Logo" class="navbar-logo" >
+                    <img class="PandoraLogo" src="/static/images/NewPandoraLogo.png" alt="Logo" class="navbar-logo">
                 </a>
                 <div>
                     <span class="navbar-brand mb-0 h1">PAnDORA</span>
@@ -34,10 +36,11 @@
                 </div>
             </div>
             <!-- Mobile Menü Button -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-    
+
             <!-- Navbar Inhalte -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <!-- Navigations Tabs -->
@@ -58,65 +61,64 @@
                         <a class="nav-link" data-toggle="tab" href="#leadTimeForChange">LTC</a>
                     </li>
                 </ul>
-                  <!-- Neues Projekt erstellen -->
-                  <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#createProjectModal">
+                <!-- Neues Projekt erstellen -->
+                <button class="btn btn-primary newProjectButton" type="button" data-toggle="modal"
+                    data-target="#createProjectModal">
                     New Project
-                  </button>
+                </button>
 
                 <!-- Button zum Öffnen des Modals -->
-  
-  <!-- Modal -->
-  <div class="modal fade" id="createProjectModal" tabindex="-1" role="dialog" aria-labelledby="createProjectModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="createProjectModalLabel">Neues Projekt erstellen</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="newProjectForm" method="POST" action="/create_project"> 
-            <div class="form-group">
-              <label for="projectName">Name</label>
-              <input type="text" class="form-control" id="projectName" name="name" required>
 
-            </div>
-            <div class="form-group">
-              <label for="projectDescription">Beschreibung</label>
-              <textarea class="form-control" id="projectDescription" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Erstellen</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  
+                <!-- Modal -->
+                <div class="modal fade" id="createProjectModal" tabindex="-1" role="dialog"
+                    aria-labelledby="createProjectModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="createProjectModalLabel">Neues Projekt erstellen</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="newProjectForm" method="POST" action="/create_project">
+                                    <div class="form-group">
+                                        <label for="projectName">Name</label>
+                                        <input type="text" class="form-control" id="projectName" name="name" required>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="projectDescription">Beschreibung</label>
+                                        <textarea class="form-control" id="projectDescription" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Erstellen</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
 
                 <!-- Projekt Auswahl -->
-                <div class="input-group mb-2 mt-2 justify-content-end">
-                    
-                    <div class="input-group-prepend ">
-                        <label class="input-group-text m-1" for="projectSelector">Bitte wähle ein Projekt
-                            aus:</label>
-                    </div>
+                <div class="input-group mb-2 mt-2 justify-content-center">
+
+                   
                     <select id="projectSelector" name="project_id" class="custom-select m-1">
                         <option value="all" {% if current_project_id=='all' %}selected{% endif %}>Alle Projekte
                         </option>
                         {% for project in projects %}
-                        <option value="{{ project.id }}" {% if current_project_id==project.id|string %}selected{%
-                            endif %}>
+                        <option value="{{ project.id }}" {% if current_project_id==project.id|string %}selected{% endif
+                            %}>
                             {{ project.name }}</option>
                         {% endfor %}
                     </select>
                     <div class="input-group-append m-1">
                         <button class="btn btn-primary" type="button" id="fetch_project_data">Daten abrufen</button>
-                       
+
                     </div>
                 </div>
-    
+
                 <!-- Logout Button -->
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
@@ -126,7 +128,7 @@
             </div>
         </div>
     </nav>
-    
+
 
     <div class="tab-content m-3">
         <div class="tab-pane active" id="codeChangeVolume">
@@ -137,9 +139,9 @@
 
                 <div class="form-group">
                     <label for="ccvInput">Code Change Volume:</label>
-                    <p>Hier kannst du Anzahl der geschriebenen Codezeilen eingeben und an die Datenbank senden:</p>
+                    <p>Anzahl hinzugefügter, geänderter und gelöschter Zeilen eingeben</p>
                     <div class="col-md-6">
-                        <input type="number" class="form-control mt-2" id="ccvInput" name="ccvValue">
+                        <input class="form-control mt-2" id="ccvInput" name="ccvValue">
                     </div>
                 </div>
                 <input type="hidden" id="hiddenProjectId" name="project_id" value="">
@@ -156,15 +158,21 @@
                                     <th class="text-center">Code Change Volume</th>
                                     <th class="text-center">User</th>
                                     <th class="text-center">Projekt</th>
+                                    <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="ccvDataBody">
                                 {% for metric in ccv_data %}
                                 <tr>
                                     <td class="text-center">{{ metric.timestamp.strftime('%H:%M %d.%m.%Y') }}</td>
-                                    <td class="text-center">{{ metric.code_change_volume }}</td>
+                                    <td class="text-center">{{ metric.code_change_volume | int}}</td>
                                     <td class="text-center">{{ metric.user.username }}</td>
                                     <td class="text-center">{{ metric.projekt.name }}</td>
+                                    <td class="text-center">
+                                        <a href="{{ url_for('edit_ccv', ccv_id=metric.id) }}">
+                                            <i class="fas fa-cog"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -186,57 +194,101 @@
 
         <div class="tab-pane" id="mttr">
             <!-- Hier den Inhalt für MTTR einfügen -->
+
+                <!-- Button, der das Modal auslöst -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#incidentModal">
+                    New Incident
+                </button>
+            <div class="container mttrcharts">
+                <div>
+                    <canvas id="mttrChart"></canvas>
+                </div>
+
+                <div>
+                    <h3>Gesammtausfallzeit in Minuten</h3>
+                    <canvas id="mttrRingChart"></canvas>
+                </div>
+
+
+            </div>
+
             <div class="container">
                 <div class="row">
-                  
-                    <p>Die Mean Time To Recover (MTTR) beträgt: <span id="mttrDisplay">Zum abrufen der MTTR "Daten abrufen" klicken</span></p>
+
+                    <p>Die Mean Time To Recover (MTTR) beträgt: <span id="mttrDisplay">Zum abrufen der MTTR "Daten
+                            abrufen" klicken</span></p>
 
 
                     <p>Hier kannst du die Details für einen Vorfall eingeben:</p>
-                    <div class="col-md-6">
-                        <form method="POST" action="/submit_mttr">
-                            <!-- Startzeit des Vorfalls -->
-                            <div class="form-group">
-                                <label for="start_timeInput">Startzeit des Vorfalls:</label>
-                                <input type="datetime-local" class="form-control" id="start_timeInput"
-                                    name="start_time">
+
+                
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="incidentModal" tabindex="-1" role="dialog"
+                        aria-labelledby="incidentModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="incidentModalLabel">Neuer Vorfall</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- Hier fügst du dein Formular ein -->
+                                    <form method="POST" action="/submit_mttr">
+                                        <form method="POST" action="/submit_mttr">
+                                            <!-- Startzeit des Vorfalls -->
+                                            <div class="form-group">
+                                                <label for="start_timeInput">Startzeit des Vorfalls:</label>
+                                                <input type="datetime-local" class="form-control" id="start_timeInput"
+                                                    name="start_time">
+                                            </div>
+                                            <!-- Endzeit des Vorfalls -->
+                                            <div class="form-group">
+                                                <label for="end_timeInput">Endzeit des Vorfalls:</label>
+                                                <input type="datetime-local" class="form-control" id="end_timeInput" name="end_time">
+                                            </div>
+                                            <!-- Beschreibung des Vorfalls -->
+                                            <div class="form-group">
+                                                <label for="descriptionInput">Beschreibung:</label>
+                                                <textarea class="form-control" id="descriptionInput" name="description"
+                                                    rows="3"></textarea>
+                                            </div>
+                                            <!-- Ursache des Vorfalls -->
+                                            <div class="form-group">
+                                                <label for="causeInput">Ursache:</label>
+                                                <textarea class="form-control" id="causeInput" name="cause" rows="3"></textarea>
+                                            </div>
+                                            <!-- Wie wurde das Problem behoben -->
+                                            <div class="form-group">
+                                                <label for="resolutionInput">Behebung:</label>
+                                                <textarea class="form-control" id="resolutionInput" name="resolution"
+                                                    rows="3"></textarea>
+                                            </div>
+                                            <!-- Auswahl des zugehörigen Projekts -->
+                                            <div class="form-group">
+                                                <label for="projectSelect">Projekt:</label>
+                                                <select class="form-control" id="projectSelect" name="project_id">
+                                                    <!-- Hier sollten die Projekt-Optionen aus der Datenbank geladen werden -->
+                                                    {% for project in projects %}
+                                                    <option value="{{ project.id }}">{{ project.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Absenden</button>
+                                        </form> <!-- Hier kommen die Formularfelder -->
+                                        <!-- ... -->
+                                        
+                                    </form>
+                                </div>
                             </div>
-                            <!-- Endzeit des Vorfalls -->
-                            <div class="form-group">
-                                <label for="end_timeInput">Endzeit des Vorfalls:</label>
-                                <input type="datetime-local" class="form-control" id="end_timeInput" name="end_time">
-                            </div>
-                            <!-- Beschreibung des Vorfalls -->
-                            <div class="form-group">
-                                <label for="descriptionInput">Beschreibung:</label>
-                                <textarea class="form-control" id="descriptionInput" name="description"
-                                    rows="3"></textarea>
-                            </div>
-                            <!-- Ursache des Vorfalls -->
-                            <div class="form-group">
-                                <label for="causeInput">Ursache:</label>
-                                <textarea class="form-control" id="causeInput" name="cause" rows="3"></textarea>
-                            </div>
-                            <!-- Wie wurde das Problem behoben -->
-                            <div class="form-group">
-                                <label for="resolutionInput">Behebung:</label>
-                                <textarea class="form-control" id="resolutionInput" name="resolution"
-                                    rows="3"></textarea>
-                            </div>
-                            <!-- Auswahl des zugehörigen Projekts -->
-                            <div class="form-group">
-                                <label for="projectSelect">Projekt:</label>
-                                <select class="form-control" id="projectSelect" name="project_id">
-                                    <!-- Hier sollten die Projekt-Optionen aus der Datenbank geladen werden -->
-                                    {% for project in projects %}
-                                    <option value="{{ project.id }}">{{ project.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Absenden</button>
-                        </form>
+                        </div>
                     </div>
-                    <div class="col-md-6">
+
+
+                   
+                    <div class="col-md-6 mttrtable">
                         <table class="table">
                             <!-- Tabellenkopf -->
                             <thead>
@@ -255,7 +307,7 @@
                                     <td>{{ incident.end_time.strftime('%H:%M %d.%m.%Y') }}</td>
                                     <td>{{ incident.description }}</td>
                                     <td>{{ incident.projekt.name }}</td>
-                                    
+
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -263,11 +315,12 @@
                     </div>
                 </div>
             </div>
+            
 
         </div>
 
 
-        <div class="tab-pane" id="changeFailureRate">
+        <div class="tab-pane container" id="changeFailureRate">
             <h2>Change Failure Rate Berechnung</h2>
 
             <div>
@@ -279,7 +332,8 @@
 
             </div>
 
-            <p>Die aktuelle Change Failure Rate für das ausgewählte Projekt beträgt: <span id="cfrDisplay">{{ '%.2f'|format (cfr) }}%</span></p>
+            <p>Die aktuelle Change Failure Rate für das ausgewählte Projekt beträgt: <strong><span id="cfrDisplay">{{ '%.2f'|format(cfr) }}%</span></strong></p>
+
 
         </div>
 
@@ -288,14 +342,16 @@
             <!-- Hier den Inhalt für Deploy einfügen -->
             <div class="container mt-4">
                 <h3>Deployment Frequency (DF)</h3>
-                <p id="deploymentFrequency">Die aktuelle Deployment Frequency für das ausgewählte Projekt beträgt: <strong id="dfValue">{{ df }}</strong> Deployments pro Monat.</p>
-
-            </div>
-            <div id="chartData" style="width:100%;max-width:600px"
+                <p id="deploymentFrequency">Die aktuelle Deployment Frequency für das ausgewählte Projekt beträgt:
+                    <strong id="dfValue">{{ df }}</strong> Deployments pro Monat.
+                </p>
+                <div id="chartData" style="width:100%;max-width:600px"
                 data-months='{{ months|tojson|replace("\"", "&quot;") }}'
                 data-deployments='{{ monthly_deployments|tojson|replace("\"", "&quot;") }}'>
                 <canvas id="myBarChart"></canvas>
             </div>
+            </div>
+           
 
         </div>
 
