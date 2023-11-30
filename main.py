@@ -29,19 +29,19 @@ Lizenz: MIT (oder jede andere Lizenz, die Sie verwenden möchten)
 # Hier beginnt der eigentliche Code...
 
 from flask import Flask, jsonify, render_template, request, redirect, url_for
-from db import db  # Stelle sicher, dass du die notwendigen Imports hast
+from db import db  
 from datetime import datetime
 from flask_migrate import Migrate
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, login_required,  current_user
 from sqlalchemy import extract
 from models import User, CD_METRIK, Projekt, Incident, LTC
 from sqlalchemy.orm import joinedload
-from werkzeug.security import generate_password_hash
-from werkzeug.security import check_password_hash
 from flask import session
-
+from views.auth import auth
+from flask_login import current_user
 
 app = Flask(__name__, template_folder="templates")
+app.register_blueprint(auth, url_prefix='/auth')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -52,7 +52,7 @@ db.init_app(app)
 migrate = Migrate(app, db)
 
 login_manager = LoginManager(app)
-login_manager.login_view = "login"
+login_manager.login_view = "auth.login"
 login_manager.init_app(app)
 
 
@@ -62,7 +62,8 @@ def start_page():
     project_id = request.args.get('project_id', 'all')
     months, monthly_deployments = get_monthly_deployments(project_id)
       # Holen  den Benutzernamen aus der Session
-    username = session.get('username', 'Unbekannter Benutzer')
+    username = current_user.username if current_user.is_authenticated else 'Unbekannter Benutzer'
+
 
     if project_id == 'all':
         mttr_data = calculate_mttr()  # Berechnet die MTTR für alle Projekte
@@ -444,68 +445,6 @@ def get_ccv_data():
 def inject_projects():
     projects = Projekt.query.all()
     return dict(projects=projects)
-
-
-###@app.route("/login", methods=["GET", "POST"])
-##def login():
-    error = None
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-        user = User.query.filter_by(username=username).first()
-        if user and user.password == password:
-            login_user(user)
-            return redirect(url_for("start_page"))
-        else:
-            error = "Benutzername oder Passwort ist nicht korrekt!"
-    return render_template("login.html", error=error)
-
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    error = None
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            login_user(user)
-            session['username'] = username 
-            return redirect(url_for("start_page"))
-        else:
-            error = "Benutzername oder Passwort ist nicht korrekt!"
-    return render_template("login.html", error=error)
-
-
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for("login"))
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form['new_username']
-        password = request.form['new_password']
-
-        # Überprüfen, ob der Benutzername bereits existiert
-        existing_user = User.query.filter_by(username=username).first()
-        if existing_user:
-            error_message = "Dieser Benutzername ist bereits vergeben."
-            return render_template('login.html', register_error=error_message)
-
-        # Hashen des Passworts und Erstellen eines neuen Benutzers
-        hashed_password = generate_password_hash(password)
-        new_user = User(username=username, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-
-        return redirect('/login')
-
-    return render_template('login.html')
 
 
 

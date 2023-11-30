@@ -1,27 +1,29 @@
 # Diff Summary
 
-Date : 2023-11-07 08:36:53
+Date : 2023-11-30 11:12:19
 
 Directory /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics
 
-Total : 3 files,  110 codes, 48 comments, 11 blanks, all 169 lines
+Total : 5 files,  107 codes, -1 comments, 4 blanks, all 110 lines
 
 [Summary](results.md) / [Details](details.md) / Diff Summary / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Python | 1 | 44 | 3 | 7 | 54 |
-| JavaScript | 1 | 35 | 43 | 7 | 85 |
-| HTML | 1 | 31 | 2 | -3 | 30 |
+| CSS | 1 | 46 | -21 | -6 | 19 |
+| JavaScript | 1 | 32 | 16 | 4 | 52 |
+| HTML | 2 | 26 | 3 | 7 | 36 |
+| Python | 1 | 3 | 1 | -1 | 3 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 3 | 110 | 48 | 11 | 169 |
-| . (Files) | 1 | 44 | 3 | 7 | 54 |
-| static | 1 | 35 | 43 | 7 | 85 |
-| static/js | 1 | 35 | 43 | 7 | 85 |
-| templates | 1 | 31 | 2 | -3 | 30 |
+| . | 5 | 107 | -1 | 4 | 110 |
+| . (Files) | 1 | 3 | 1 | -1 | 3 |
+| static | 2 | 78 | -5 | -2 | 71 |
+| static/css | 1 | 46 | -21 | -6 | 19 |
+| static/js | 1 | 32 | 16 | 4 | 52 |
+| templates | 2 | 26 | 3 | 7 | 36 |
 
 [Summary](results.md) / [Details](details.md) / Diff Summary / [Diff Details](diff-details.md)

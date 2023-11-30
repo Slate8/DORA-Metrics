@@ -111,14 +111,14 @@
                 <div class="user-logout-container">
                     <!-- Dropdown Trigger -->
                     <div class="dropdown ">
-                        <div class="user-circle dropdown-toggle " id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ username[0]|upper }}
+                        <div class="user-circle dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ current_user.username[0]|upper if current_user.is_authenticated else 'U' }}
                         </div>
                 
                         <!-- Dropdown Menu -->
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item" href="#">Settings</a>
-                            <a class="dropdown-item" href="/logout">Logout</a>
+                            <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
                         </div>
                     </div>
                 </div>
