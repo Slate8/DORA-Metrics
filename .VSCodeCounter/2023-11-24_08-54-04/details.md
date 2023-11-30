@@ -1,10 +1,10 @@
 # Details
 
-Date : 2023-10-26 15:48:14
+Date : 2023-11-24 08:54:04
 
 Directory /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics
 
-Total : 26 files,  1186 codes, 278 comments, 362 blanks, all 1826 lines
+Total : 29 files,  2069 codes, 378 comments, 564 blanks, all 3011 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -17,7 +17,7 @@ Total : 26 files,  1186 codes, 278 comments, 362 blanks, all 1826 lines
 | [add_user.py](/add_user.py) | Python | 16 | 0 | 5 | 21 |
 | [db.py](/db.py) | Python | 2 | 0 | 2 | 4 |
 | [delete_db.py](/delete_db.py) | Python | 30 | 0 | 7 | 37 |
-| [main.py](/main.py) | Python | 202 | 61 | 73 | 336 |
+| [main.py](/main.py) | Python | 376 | 85 | 127 | 588 |
 | [migrations/alembic.ini](/migrations/alembic.ini) | Ini | 38 | 0 | 13 | 51 |
 | [migrations/env.py](/migrations/env.py) | Python | 54 | 34 | 26 | 114 |
 | [migrations/versions/0a21c3da577f_.py](/migrations/versions/0a21c3da577f_.py) | Python | 12 | 12 | 9 | 33 |
@@ -33,9 +33,12 @@ Total : 26 files,  1186 codes, 278 comments, 362 blanks, all 1826 lines
 | [migrations/versions/d60e16d204f8_.py](/migrations/versions/d60e16d204f8_.py) | Python | 14 | 12 | 9 | 35 |
 | [migrations/versions/f773ac403d7e_.py](/migrations/versions/f773ac403d7e_.py) | Python | 19 | 12 | 7 | 38 |
 | [models.py](/models.py) | Python | 49 | 1 | 9 | 59 |
-| [static/js/main.js](/static/js/main.js) | JavaScript | 179 | 11 | 38 | 228 |
-| [templates/edit_ltc.html](/templates/edit_ltc.html) | HTML | 48 | 3 | 11 | 62 |
-| [templates/index.html](/templates/index.html) | HTML | 249 | 21 | 47 | 317 |
-| [templates/login.html](/templates/login.html) | HTML | 42 | 1 | 6 | 49 |
+| [static/css/loginStyle.css](/static/css/loginStyle.css) | CSS | 63 | 0 | 7 | 70 |
+| [static/css/mainStyle.css](/static/css/mainStyle.css) | CSS | 129 | 30 | 39 | 198 |
+| [static/js/main.js](/static/js/main.js) | JavaScript | 518 | 39 | 94 | 651 |
+| [templates/edit_ccv.html](/templates/edit_ccv.html) | HTML | 32 | 1 | 9 | 42 |
+| [templates/edit_ltc.html](/templates/edit_ltc.html) | HTML | 52 | 3 | 12 | 67 |
+| [templates/index.html](/templates/index.html) | HTML | 346 | 36 | 74 | 456 |
+| [templates/login.html](/templates/login.html) | HTML | 87 | 3 | 15 | 105 |
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)

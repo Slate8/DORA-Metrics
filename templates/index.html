@@ -32,7 +32,7 @@
                 </a>
                 <div>
                     <span class="navbar-brand mb-0 h1">PAnDORA</span>
-                    <p class="mb-0">Performance Analyzer for DORA Metrics</p>
+                    <p class="mb-0 pandoraAkro">Performance Analyzer for DORA Metrics</p>
                 </div>
             </div>
             <!-- Mobile Menü Button -->
@@ -46,7 +46,10 @@
                 <!-- Navigations Tabs -->
                 <ul class="nav nav-pills mx-auto reiterMenu" id="metricTabs">
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#codeChangeVolume">CCV</a>
+                        <a class="nav-link active dashboardbutton" data-toggle="tab" href="#dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#codeChangeVolume">CCV</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="tab" href="#mttr">MTTR</a>
@@ -61,6 +64,8 @@
                         <a class="nav-link" data-toggle="tab" href="#leadTimeForChange">LTC</a>
                     </li>
                 </ul>
+
+                
                 <!-- Neues Projekt erstellen -->
                 <button class="btn btn-primary newProjectButton" type="button" data-toggle="modal"
                     data-target="#createProjectModal">
@@ -100,38 +105,70 @@
 
 
 
-                <!-- Projekt Auswahl -->
-                <div class="input-group mb-2 mt-2 justify-content-center">
-
-                   
-                    <select id="projectSelector" name="project_id" class="custom-select m-1">
-                        <option value="all" {% if current_project_id=='all' %}selected{% endif %}>Alle Projekte
-                        </option>
-                        {% for project in projects %}
-                        <option value="{{ project.id }}" {% if current_project_id==project.id|string %}selected{% endif
-                            %}>
-                            {{ project.name }}</option>
-                        {% endfor %}
-                    </select>
-                    <div class="input-group-append m-1">
-                        <button class="btn btn-primary" type="button" id="fetch_project_data">Daten abrufen</button>
-
+          
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                <div class="user-logout-container">
+                    <!-- Dropdown Trigger -->
+                    <div class="dropdown ">
+                        <div class="user-circle dropdown-toggle " id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ username[0]|upper }}
+                        </div>
+                
+                        <!-- Dropdown Menu -->
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="#">Settings</a>
+                            <a class="dropdown-item" href="/logout">Logout</a>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Logout Button -->
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="btn btn-outline-primary" href="/logout">Logout</a>
-                    </li>
-                </ul>
+            </li>
+            </ul>
+                
             </div>
         </div>
     </nav>
 
+    <div class="input-group mb-2 mt-2 projectandlogout ">
+
+                   
+        <select id="projectSelector" name="project_id" class="custom-select m-1">
+            <option value="all" {% if current_project_id=='all' %}selected{% endif %}>Alle Projekte
+            </option>
+            {% for project in projects %}
+            <option value="{{ project.id }}" {% if current_project_id==project.id|string %}selected{% endif
+                %}>
+                {{ project.name }}</option>
+            {% endfor %}
+        </select>
+        <div class="input-group-append m-1">
+            <button class="btn btn-primary" type="button" id="fetch_project_data">Daten abrufen</button>
+
+        </div>
+        
+   
+    </div>
 
     <div class="tab-content m-3">
-        <div class="tab-pane active" id="codeChangeVolume">
+
+        <div class="tab-pane active" id="dashboard">
+            <!-- Hier können Sie den Dashboard-Inhalt einfügen -->
+            <h2>Dashboard</h2>
+            <p>Hier kommen die Canvas- und Chart-Übersichten hin.</p>
+            <!-- Hier können Sie Canvas und Charts einfügen -->
+            <div>
+                <h2>CCV</h2>
+                <div class="col-md-6">
+                    <canvas class="lineChart" id="dashboard_myChart" style="width:100%;max-width:600px"></canvas>
+                </div>
+                <div>
+                    <h2>MTTR</h2>
+                    <canvas class="mttrChart" id="dashboard_mttrChart" style="width:100%;max-width:600px"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane" id="codeChangeVolume">
             <!-- Hier den Inhalt für Code Change Volume einfügen -->
 
 
@@ -180,7 +217,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <canvas id="myChart" style="width:100%;max-width:600px"></canvas>
+                    <canvas class="lineChart" id="myChart" style="width:100%;max-width:600px"></canvas>
                 </div>
             </div>
 
@@ -201,7 +238,7 @@
                 </button>
             <div class="container mttrcharts">
                 <div>
-                    <canvas id="mttrChart"></canvas>
+                    <canvas class="mttrChart" id="mttrChart"></canvas>
                 </div>
 
                 <div>
@@ -446,8 +483,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/static/js/main.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+   
 
 
 

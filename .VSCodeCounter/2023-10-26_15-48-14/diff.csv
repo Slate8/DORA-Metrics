@@ -1,9 +1,0 @@
-"filename", "language", "Python", "HTML", "JavaScript", "comment", "blank", "total"
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/main.py", "Python", -1, 0, 0, 12, 1, 12
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/0a21c3da577f_.py", "Python", 12, 0, 0, 12, 9, 33
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/migrations/versions/85305457bfb4_.py", "Python", 16, 0, 0, 12, 9, 37
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/models.py", "Python", 49, 0, 0, 1, 9, 59
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/static/js/main.js", "JavaScript", 0, 0, 7, 6, 1, 14
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/edit_ltc.html", "HTML", 0, 48, 0, 3, 11, 62
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/index.html", "HTML", 0, 16, 0, 3, 1, 20
-"Total", "-", 76, 64, 7, 49, 41, 237

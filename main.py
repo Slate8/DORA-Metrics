@@ -38,7 +38,7 @@ from models import User, CD_METRIK, Projekt, Incident, LTC
 from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
-
+from flask import session
 
 
 app = Flask(__name__, template_folder="templates")
@@ -61,6 +61,8 @@ login_manager.init_app(app)
 def start_page():
     project_id = request.args.get('project_id', 'all')
     months, monthly_deployments = get_monthly_deployments(project_id)
+      # Holen  den Benutzernamen aus der Session
+    username = session.get('username', 'Unbekannter Benutzer')
 
     if project_id == 'all':
         mttr_data = calculate_mttr()  # Berechnet die MTTR für alle Projekte
@@ -97,7 +99,7 @@ def start_page():
 
     projects = Projekt.query.all()
 
-    return render_template('index.html', ccv_data=ccv_data, mttr=mttr_data, projects=projects,
+    return render_template('index.html',username=username, ccv_data=ccv_data, mttr=mttr_data, projects=projects,
                            ltc_data=ltc_data, current_project_id=project_id, df=df_data, months=months,
                            monthly_deployments=monthly_deployments, failed=failed_deployments,
                            total=total_deployments, cfr=cfr, incident_data=incident_data)
@@ -469,6 +471,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             login_user(user)
+            session['username'] = username 
             return redirect(url_for("start_page"))
         else:
             error = "Benutzername oder Passwort ist nicht korrekt!"

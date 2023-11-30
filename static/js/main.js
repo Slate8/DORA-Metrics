@@ -16,6 +16,8 @@ function getColorForUser(username) {
     return userColorMap[username];
 }
 
+var lineCharts = [];
+
 function updateCharts() {
     const tableRows = document.querySelectorAll('#ccvDataBody tr');
     const groupedData = {};
@@ -82,14 +84,25 @@ function updateCharts() {
         console.log(datasets);
     }
 
-    new Chart("myChart", {
-        type: "line",
-        data: {
-            labels: allUniqueTimestamps,
-            datasets: datasets
-        },
+    const lineChartElements = document.getElementsByClassName('lineChart');
+    for (let i = 0; i < lineChartElements.length; i++) {
+        if (lineCharts[i]) {
+            // Aktualisiere vorhandene Chart-Instanz
+            lineCharts[i].data.labels = allUniqueTimestamps;
+            lineCharts[i].data.datasets = datasets;
+            lineCharts[i].update();
+        } else {
+            // Erstelle eine neue Chart-Instanz
+            lineCharts[i] = new Chart(lineChartElements[i].getContext('2d'), {
+                type: "line",
+                data: {
+                    labels: allUniqueTimestamps,
+                    datasets: datasets
+                }
+            });
+        }
+    }
 
-    });
 
     const userCodeLines = {};
 
@@ -131,10 +144,10 @@ function updateCharts() {
         }
     });
 }
-
-updateCharts();
+//Alte Abruffunktion zum befüllen der Charts und Tabellen
+/*updateCharts();
 updateBarChart();
-
+*/
 
 
 document.getElementById('fetch_project_data').addEventListener('click', function () {
@@ -226,12 +239,12 @@ function updateMTTRValue(mttr) {
     
 }
 
-let mttrChart; // Globale Variable, um die Chart-Instanz zu speichern
+// Array, um die Chart-Instanzen zu speichern
+let mttrCharts = [];
 
 function updateMTTRDisplay(mttrData) {
-  
-
-    const ctx = document.getElementById('mttrChart').getContext('2d');
+    const chartElements = document.getElementsByClassName('mttrChart');
+    
     const projectNames = [...new Set(mttrData.map(incident => incident.project))];
     const labels = [...new Set(mttrData.map(incident => incident.starttime))];
 
@@ -263,41 +276,47 @@ function updateMTTRDisplay(mttrData) {
         };
     });
 
-    // Erstelle oder aktualisiere das Diagramm
-    if (mttrChart) {
-        mttrChart.data.labels = labels;
-        mttrChart.data.datasets = datasets;
-        mttrChart.options.plugins.title.text = `MTTR`;
-        mttrChart.update();
-    } else {
-        mttrChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: datasets
-            },
-            options: {
-                responsive: false,
-                maintainAspectRatio: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
+    // Iteriere über alle Chart-Elemente und erstelle oder aktualisiere das Diagramm
+    for (let i = 0; i < chartElements.length; i++) {
+        const ctx = chartElements[i].getContext('2d');
+
+        if (mttrCharts[i]) {
+            // Aktualisiere das vorhandene Diagramm
+            mttrCharts[i].data.labels = labels;
+            mttrCharts[i].data.datasets = datasets;
+            mttrCharts[i].update();
+        } else {
+            // Erstelle ein neues Diagramm
+            mttrCharts[i] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Dauer (Stunden)'
+                            }
+                        }
+                    },
+                    plugins: {
                         title: {
                             display: true,
-                            text: 'Dauer (Stunden)'
+                            text: `MTTR`
                         }
                     }
-                },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: `MTTR`
-                    }
                 }
-            }
-        });
+            });
+        }
     }
 }
+
 
 // Verwendet beim Laden der Seite und auch wenn neue Daten abgerufen werden
 document.getElementById('fetch_project_data').addEventListener('click', function () {
@@ -333,8 +352,9 @@ function updateDFChart(dfData) {
         });
         window.myBarChart.update();
     } else {
-        // Hier könnten Sie Ihr Diagramm initialisieren, wenn es noch nicht existiert
+        
         var ctx = document.getElementById('myBarChart').getContext('2d');
+      
         window.myBarChart = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -342,8 +362,8 @@ function updateDFChart(dfData) {
                 datasets: [{
                     label: 'Deployments pro Monat',
                     data: dfData.deployments,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: '#216b73',
+                    borderColor: '#216b73',
                     borderWidth: 1
                 }]
             },
@@ -647,4 +667,37 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         })
         .catch(error => console.error('Fehler beim Abrufen der MTTR-Daten', error));
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+var projectId = document.getElementById('projectSelector').value;
+// Starten   einen Fetch für jede Datenquelle
+Promise.all([
+    fetch('/get_cd_metric_data?project_id=' + projectId).then(response => response.json()),
+    fetch('/get_ltc_data?project_id=' + projectId).then(response => response.json()),
+    fetch('/get_mttr_data?project_id=' + projectId).then(response => response.json()),
+    fetch('/get_cfr_data?project_id=' + projectId).then(response => response.json()),
+    fetch('/get_df_data?project_id=' + projectId).then(response => response.json()),
+    // ... fügen   hier weitere fetch Aufrufe für andere Datenquellen hinzu
+])
+    .then(alldata => {
+        // alldata[0] enthält die Antwort von '/get_cd_metric_data'
+        // alldata[1] enthält die Antwort von '/get_ltc_data'
+        // ... und so weiter für weitere Antworten
+
+        // Aktualisieren   hier die Tabellen mit den Daten von alldata
+        updateCCVTable(alldata[0]); // Eine  Funktion, um die CCV-Tabelle zu aktualisieren
+        updateLTCTable(alldata[1]); // Eine  Funktion, um die LTC-Tabelle zu aktualisieren
+        updateMTTRTable(alldata[2].data);
+        updateMTTRValue(alldata[2].mttr);
+        updateMTTRDisplay(alldata[2].data);
+        updateCFRDisplay(alldata[3]); // Ihre neue Funktion, um die CFR anzuzeigen
+        updateDFChart(alldata[4]);
+        document.getElementById('dfValue').textContent = alldata[4].df;
+        // ... weitere Funktionen, um andere Tabellen zu aktualisieren
+
+        // Nach dem Aktualisieren der Tabellen rufen   updateCharts erneut auf
+        updateCharts();
+    })
+    .catch(error => console.error('Fehler beim Abrufen der Daten:', error));
 });
