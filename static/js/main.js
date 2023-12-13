@@ -173,6 +173,8 @@ document.getElementById('fetch_project_data').addEventListener('click', function
             updateMTTRValue(alldata[2].mttr);
             updateMTTRDisplay(alldata[2].data);
             updateCFRDisplay(alldata[3]); // Ihre neue Funktion, um die CFR anzuzeigen
+            const cfr = alldata[3].cfr;
+            updateCFRChart(cfr);
             updateDFChart(alldata[4]);
             document.getElementById('dfValue').textContent = alldata[4].df;
             // ... weitere Funktionen, um andere Tabellen zu aktualisieren
@@ -340,6 +342,34 @@ function updateCFRDisplay(cfrData) {
     document.getElementById('total').innerText = cfrData.total;
     document.getElementById('cfrDisplay').innerText = cfrData.cfr.toFixed(2) + '%'; // Formatieren auf 2 Dezimalstellen
 }
+
+// Funktion zum Erstellen des CFR Balkendiagramms
+function updateCFRChart(cfr) {
+    const ctx = document.getElementById('cfrBarChart').getContext('2d');
+    const cfrChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Change Failure Rate'],
+            datasets: [{
+                label: 'CFR (%)',
+                data: [cfr],
+                backgroundColor: '#216b73',
+                borderColor: '#216b73',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 30  // Skala bis 30% festgelegt
+                }
+            }
+        }
+    });
+}
+
+
 
 function updateDFChart(dfData) {
     
@@ -538,7 +568,8 @@ function parseDate(dateStr) {
     const [day, month, year] = date.split('.').map(part => parseInt(part, 10));
 
     // Erstellen eines neuen Date-Objekts
-    // Beachten Sie, dass Monate in JavaScript von 0 bis 11 gezählt werden, daher -1 für den Monat
+    
+
     return new Date(year, month - 1, day, hours, minutes);
 }
 
@@ -550,13 +581,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const projectNames = [...new Set(data.data.map(incident => incident.project))];
             const labels = [...new Set(data.data.map(incident => incident.starttime))];
 
-            // Initialisieren Sie die Datenstruktur für jedes Projekt mit Nullen
+            // Initialisieren der Datenstruktur für jedes Projekt mit Nullen
             const projectData = projectNames.reduce((acc, projectName) => {
                 acc[projectName] = labels.map(() => null); // Starten mit null für jede Zeitmarke
                 return acc;
             }, {});
 
-            // Füllen Sie die tatsächlichen Daten für jedes Projekt
+            // Füllen der tatsächlichen Daten für jedes Projekt
             data.data.forEach(incident => {
                 const projectName = incident.project;
                 const labelIndex = labels.indexOf(incident.starttime);
@@ -572,9 +603,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 return {
                     label: projectName,
                     data: projectData[projectName],
-                    // Hier können Sie Farben dynamisch zuweisen, je nach Anzahl der Projekte
-                    backgroundColor: color, // Beispiel für eine Farbe
-                    borderColor: color, // Beispiel für eine Farbe
+                    // Farben dynamisch zuweisen, je nach Anzahl der Projekte
+                    backgroundColor: color, 
+                    borderColor: color, 
                     borderWidth: 1
                 };
             });
@@ -583,7 +614,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const mttrChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels, // Verwenden Sie die generierten Labels
+                    labels: labels, 
                     datasets: datasets
                 },
                 options: {
@@ -692,6 +723,8 @@ Promise.all([
         updateMTTRValue(alldata[2].mttr);
         updateMTTRDisplay(alldata[2].data);
         updateCFRDisplay(alldata[3]); // Ihre neue Funktion, um die CFR anzuzeigen
+        const cfr = alldata[3].cfr;
+        updateCFRChart(cfr);
         updateDFChart(alldata[4]);
         document.getElementById('dfValue').textContent = alldata[4].df;
         // ... weitere Funktionen, um andere Tabellen zu aktualisieren

@@ -39,6 +39,12 @@ from sqlalchemy.orm import joinedload
 from flask import session
 from views.auth import auth
 from flask_login import current_user
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from flask import abort
+
+
 
 app = Flask(__name__, template_folder="templates")
 app.register_blueprint(auth, url_prefix='/auth')
@@ -46,7 +52,8 @@ app.register_blueprint(auth, url_prefix='/auth')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # muss noch angepasst werden
-app.config['SECRET_KEY'] = 'dein_geheimer_schluessel'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+
 
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -92,7 +99,7 @@ def start_page():
         total_deployments = LTC.query.filter_by(projekt_id=project_id).count()
         incident_data = Incident.query.filter_by(projekt_id=project_id).all()
 
-        # Berechnen der CFR
+        # Berechnen der CFR im html
     if total_deployments != 0:
         cfr = (failed_deployments / total_deployments) * 100
     else:
@@ -219,6 +226,7 @@ def get_cfr_data():
         cfr = 0
 
     return jsonify({'cfr': cfr, 'failed': failed_deployments, 'total': total_deployments})
+
 
 
 @app.route('/get_df_data')

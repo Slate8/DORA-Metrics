@@ -123,6 +123,7 @@
                     </div>
                 </div>
             </li>
+           
             </ul>
                 
             </div>
@@ -152,10 +153,10 @@
     <div class="tab-content m-3">
 
         <div class="tab-pane active" id="dashboard">
-            <!-- Hier können Sie den Dashboard-Inhalt einfügen -->
+            <!--  Dashboard-Inhalt -->
             <h2>Dashboard</h2>
             <p>Hier kommen die Canvas- und Chart-Übersichten hin.</p>
-            <!-- Hier können Sie Canvas und Charts einfügen -->
+            <!--  Canvas und Charts -->
             <div>
                 <h2>CCV</h2>
                 <div class="col-md-6">
@@ -169,7 +170,7 @@
         </div>
 
         <div class="tab-pane" id="codeChangeVolume">
-            <!-- Hier den Inhalt für Code Change Volume einfügen -->
+            <!--Code Change Volume-->
 
 
             <form id="ccvForm" method="POST" action="/submit_ccv">
@@ -371,12 +372,15 @@
 
             <p>Die aktuelle Change Failure Rate für das ausgewählte Projekt beträgt: <strong><span id="cfrDisplay">{{ '%.2f'|format(cfr) }}%</span></strong></p>
 
+            <div>
+                <canvas class="" id="cfrBarChart" style="width:100%;max-width:600px"></canvas>
+            </div>
 
         </div>
 
 
         <div class="tab-pane" id="deployment">
-            <!-- Hier den Inhalt für Deploy einfügen -->
+            <!-- Deployment  -->
             <div class="container mt-4">
                 <h3>Deployment Frequency (DF)</h3>
                 <p id="deploymentFrequency">Die aktuelle Deployment Frequency für das ausgewählte Projekt beträgt:
@@ -447,7 +451,6 @@
                                 <th class="text-center">Lead Time</th>
                                 <th class="text-center">Deploy Succesfull</th>
                                 <th class="text-center">Actions</th>
-                                <!-- Andere notwendige Spalten können hier hinzugefügt werden -->
                             </tr>
                         </thead>
                         <tbody id="ltcDataBody">
