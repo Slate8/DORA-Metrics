@@ -65,7 +65,7 @@
                     </li>
                 </ul>
 
-                
+
                 <!-- Neues Projekt erstellen -->
                 <button class="btn btn-primary newProjectButton" type="button" data-toggle="modal"
                     data-target="#createProjectModal">
@@ -105,40 +105,40 @@
 
 
 
-          
+
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
-                <div class="user-logout-container">
-                    <!-- Dropdown Trigger -->
-                    <div class="dropdown ">
-                        <div class="user-circle dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ current_user.username[0]|upper if current_user.is_authenticated else 'U' }}
+                        <div class="user-logout-container">
+                            <!-- Dropdown Trigger -->
+                            <div class="dropdown ">
+                                <div class="user-circle dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                    {{ current_user.username[0]|upper if current_user.is_authenticated else 'U' }}
+                                </div>
+
+                                <!-- Dropdown Menu -->
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" href="#">Settings</a>
+                                    <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
+                                </div>
+                            </div>
                         </div>
-                
-                        <!-- Dropdown Menu -->
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="#">Settings</a>
-                            <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </li>
-           
-            </ul>
-                
+                    </li>
+
+                </ul>
+
             </div>
         </div>
     </nav>
 
     <div class="input-group mb-2 mt-2 projectandlogout ">
 
-                   
+
         <select id="projectSelector" name="project_id" class="custom-select m-1">
             <option value="all" {% if current_project_id=='all' %}selected{% endif %}>Alle Projekte
             </option>
             {% for project in projects %}
-            <option value="{{ project.id }}" {% if current_project_id==project.id|string %}selected{% endif
-                %}>
+            <option value="{{ project.id }}" {% if current_project_id==project.id|string %}selected{% endif %}>
                 {{ project.name }}</option>
             {% endfor %}
         </select>
@@ -146,8 +146,8 @@
             <button class="btn btn-primary" type="button" id="fetch_project_data">Daten abrufen</button>
 
         </div>
-        
-   
+
+
     </div>
 
     <div class="tab-content m-3">
@@ -157,14 +157,27 @@
             <h2>Dashboard</h2>
             <p>Hier kommen die Canvas- und Chart-Übersichten hin.</p>
             <!--  Canvas und Charts -->
-            <div>
-                <h2>CCV</h2>
+            <div class="dasboardCharts">
+
                 <div class="col-md-6">
+                    <h2>CCV</h2>
                     <canvas class="lineChart" id="dashboard_myChart" style="width:100%;max-width:600px"></canvas>
                 </div>
                 <div>
                     <h2>MTTR</h2>
                     <canvas class="mttrChart" id="dashboard_mttrChart" style="width:100%;max-width:600px"></canvas>
+                </div>
+                <div>
+                    <h2>CFR</h2>
+                    <canvas class="cfrChart" id="dashboard_cfrChart" style="width:100%;max-width:600px"></canvas>
+                </div>
+                <div>
+                    <h2>DF</h2>
+                    <canvas class="dfChart" id="dashboard_dfChart" style="width:100%;max-width:600px"></canvas>
+                </div>
+                <div>
+                    <h2>LTC</h2>
+                    <canvas class="ltcChart" id="dashboard_ltcChart" style="width:100%;max-width:600px"></canvas>
                 </div>
             </div>
         </div>
@@ -233,10 +246,10 @@
         <div class="tab-pane" id="mttr">
             <!-- Hier den Inhalt für MTTR einfügen -->
 
-                <!-- Button, der das Modal auslöst -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#incidentModal">
-                    New Incident
-                </button>
+            <!-- Button, der das Modal auslöst -->
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#incidentModal">
+                New Incident
+            </button>
             <div class="container mttrcharts">
                 <div>
                     <canvas class="mttrChart" id="mttrChart"></canvas>
@@ -259,7 +272,7 @@
 
                     <p>Hier kannst du die Details für einen Vorfall eingeben:</p>
 
-                
+
 
                     <!-- Modal -->
                     <div class="modal fade" id="incidentModal" tabindex="-1" role="dialog"
@@ -285,7 +298,8 @@
                                             <!-- Endzeit des Vorfalls -->
                                             <div class="form-group">
                                                 <label for="end_timeInput">Endzeit des Vorfalls:</label>
-                                                <input type="datetime-local" class="form-control" id="end_timeInput" name="end_time">
+                                                <input type="datetime-local" class="form-control" id="end_timeInput"
+                                                    name="end_time">
                                             </div>
                                             <!-- Beschreibung des Vorfalls -->
                                             <div class="form-group">
@@ -296,7 +310,8 @@
                                             <!-- Ursache des Vorfalls -->
                                             <div class="form-group">
                                                 <label for="causeInput">Ursache:</label>
-                                                <textarea class="form-control" id="causeInput" name="cause" rows="3"></textarea>
+                                                <textarea class="form-control" id="causeInput" name="cause"
+                                                    rows="3"></textarea>
                                             </div>
                                             <!-- Wie wurde das Problem behoben -->
                                             <div class="form-group">
@@ -317,7 +332,7 @@
                                             <button type="submit" class="btn btn-primary">Absenden</button>
                                         </form> <!-- Hier kommen die Formularfelder -->
                                         <!-- ... -->
-                                        
+
                                     </form>
                                 </div>
                             </div>
@@ -325,7 +340,7 @@
                     </div>
 
 
-                   
+
                     <div class="col-md-6 mttrtable">
                         <table class="table">
                             <!-- Tabellenkopf -->
@@ -353,7 +368,7 @@
                     </div>
                 </div>
             </div>
-            
+
 
         </div>
 
@@ -370,7 +385,8 @@
 
             </div>
 
-            <p>Die aktuelle Change Failure Rate für das ausgewählte Projekt beträgt: <strong><span id="cfrDisplay">{{ '%.2f'|format(cfr) }}%</span></strong></p>
+            <p>Die aktuelle Change Failure Rate für das ausgewählte Projekt beträgt: <strong><span id="cfrDisplay">{{
+                        '%.2f'|format(cfr) }}%</span></strong></p>
 
             <div>
                 <canvas class="" id="cfrBarChart" style="width:100%;max-width:600px"></canvas>
@@ -387,12 +403,12 @@
                     <strong id="dfValue">{{ df }}</strong> Deployments pro Monat.
                 </p>
                 <div id="chartData" style="width:100%;max-width:600px"
-                data-months='{{ months|tojson|replace("\"", "&quot;") }}'
-                data-deployments='{{ monthly_deployments|tojson|replace("\"", "&quot;") }}'>
-                <canvas id="myBarChart"></canvas>
+                    data-months='{{ months|tojson|replace("\"", "&quot;") }}'
+                    data-deployments='{{ monthly_deployments|tojson|replace("\"", "&quot;") }}'>
+                    <canvas id="myBarChart"></canvas>
+                </div>
             </div>
-            </div>
-           
+
 
         </div>
 
@@ -400,45 +416,55 @@
 
         <div class="tab-pane" id="leadTimeForChange">
             <h2>Lead Time for Changes Erfassung</h2>
-
-            <!-- Formular zum Erfassen von Commit- und Deployment-Daten -->
-            <form id="ltcForm" method="POST" action="/submit_ltc">
-                <!-- Commit Datum und Uhrzeit -->
-                <div class="form-group">
-                    <label for="commitDatetime">Commit Datum und Uhrzeit:</label>
-                    <input type="datetime-local" class="form-control" id="commitDatetime" name="commit_datetime">
-                </div>
-
-                <!-- Deployment Datum und Uhrzeit -->
-                <div class="form-group">
-                    <label for="deploymentDatetime">Deployment Datum und Uhrzeit:</label>
-                    <input type="datetime-local" class="form-control" id="deploymentDatetime"
-                        name="deployment_datetime">
-                </div>
-
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="inputGroupSelect01">Erfassug für das Projekt:</label>
-                    </div>
-                    <select id="ltcprojectSelector" name="project_id" class="custom-select">
-                        <option value="all">Alle Projekte</option>
-                        {% for project in projects %}
-                        <option value="{{ project.id }}">{{ project.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+            <div class="dasboardCharts">
+                <!-- Formular zum Erfassen von Commit- und Deployment-Daten -->
                 <div>
-                    <label>Deployment Status:</label>
-                    <input type="radio" id="success" name="deployment_status" value="true" checked>
-                    <label for="success">Erfolgreich</label>
+                    <form id="ltcForm" method="POST" action="/submit_ltc">
+                        <!-- Commit Datum und Uhrzeit -->
+                        <div class="form-group">
+                            <label for="commitDatetime">Commit Datum und Uhrzeit:</label>
+                            <input type="datetime-local" class="form-control" id="commitDatetime"
+                                name="commit_datetime">
+                        </div>
 
-                    <input type="radio" id="failure" name="deployment_status" value="false">
-                    <label for="failure">Fehlgeschlagen</label>
+                        <!-- Deployment Datum und Uhrzeit -->
+                        <div class="form-group">
+                            <label for="deploymentDatetime">Deployment Datum und Uhrzeit:</label>
+                            <input type="datetime-local" class="form-control" id="deploymentDatetime"
+                                name="deployment_datetime">
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="inputGroupSelect01">Erfassug für das
+                                    Projekt:</label>
+                            </div>
+                            <select id="ltcprojectSelector" name="project_id" class="custom-select">
+                                <option value="all">Alle Projekte</option>
+                                {% for project in projects %}
+                                <option value="{{ project.id }}">{{ project.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                        <div>
+                            <label>Deployment Status:</label>
+                            <input type="radio" id="success" name="deployment_status" value="true" checked>
+                            <label for="success">Erfolgreich</label>
+
+                            <input type="radio" id="failure" name="deployment_status" value="false">
+                            <label for="failure">Fehlgeschlagen</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Erfassung absenden</button>
+                    </form>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Erfassung absenden</button>
-            </form>
-
+                <div>
+                    <canvas id="ltcBarChart" style="width:100%;max-width:600px"></canvas>
+                </div>
+            </div>
             <!-- Tabelle zur Anzeige der Lead Time for Changes Daten -->
             <div class="row mt-4">
                 <div class="col-md-12">
@@ -474,6 +500,7 @@
                             {% endfor %}
                         </tbody>
                     </table>
+
                 </div>
             </div>
         </div>
@@ -486,7 +513,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/static/js/main.js"></script>
-   
+
 
 
 

@@ -169,16 +169,23 @@ document.getElementById('fetch_project_data').addEventListener('click', function
             // Aktualisieren   hier die Tabellen mit den Daten von alldata
             updateCCVTable(alldata[0]); // Eine  Funktion, um die CCV-Tabelle zu aktualisieren
             updateLTCTable(alldata[1]); // Eine  Funktion, um die LTC-Tabelle zu aktualisieren
+            const ltcData = alldata[1]; 
+            updateLTCChart(alldata[1]);
+            updateLTCDashboard(ltcData);
+
             updateMTTRTable(alldata[2].data);
             updateMTTRValue(alldata[2].mttr);
             updateMTTRDisplay(alldata[2].data);
-            updateCFRDisplay(alldata[3]); // Ihre neue Funktion, um die CFR anzuzeigen
+            updateCFRDisplay(alldata[3]); //  neue Funktion, um die CFR anzuzeigen
             const cfr = alldata[3].cfr;
             updateCFRChart(cfr);
+            updateCFRDashboard(cfr);
             updateDFChart(alldata[4]);
+            const df = alldata[4].df;
+            updateDFDashboard(df);
             document.getElementById('dfValue').textContent = alldata[4].df;
             // ... weitere Funktionen, um andere Tabellen zu aktualisieren
-
+            
             // Nach dem Aktualisieren der Tabellen rufen   updateCharts erneut auf
             updateCharts();
         })
@@ -272,8 +279,8 @@ function updateMTTRDisplay(mttrData) {
         return {
             label: projectName,
             data: projectData[projectName],
-            backgroundColor: color,
-            borderColor: color,
+            backgroundColor: '#fea900',
+            borderColor: '#fea900',
             borderWidth: 1
         };
     });
@@ -319,6 +326,132 @@ function updateMTTRDisplay(mttrData) {
     }
 }
 
+// Funktion zum Erstellen des CFR Balkendiagramms
+function updateCFRDashboard(cfr) {
+    const chartElements = document.getElementsByClassName('cfrChart');
+
+    for (let i = 0; i < chartElements.length; i++) {
+        const ctx = chartElements[i].getContext('2d');
+
+        // Überprüfen, ob bereits eine Chart-Instanz für dieses Canvas-Element existiert
+        if (window['cfrChart' + i]) {
+            // Aktualisiere das vorhandene Diagramm
+            window['cfrChart' + i].data.datasets[0].data = [cfr];
+            window['cfrChart' + i].update();
+        } else {
+            // Erstelle ein neues Diagramm
+            window['cfrChart' + i] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Change Failure Rate'],
+                    datasets: [{
+                        label: 'CFR (%)',
+                        data: [cfr],
+                        backgroundColor: '#800080',
+                        borderColor: '#800080',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 30  // Skala bis 30% festgelegt
+                        }
+                    }
+                }
+            });
+        }
+    }
+}
+
+function updateDFDashboard(dfValue) {
+    const chartElements = document.getElementsByClassName('dfChart');
+
+    for (let i = 0; i < chartElements.length; i++) {
+        const ctx = chartElements[i].getContext('2d');
+
+        // Überprüfen, ob bereits eine Chart-Instanz für dieses Canvas-Element existiert
+        if (window['dfChart' + i]) {
+            // Aktualisiere das vorhandene Diagramm
+            window['dfChart' + i].data.datasets[0].data = [dfValue];
+            window['dfChart' + i].update();
+        } else {
+            // Erstelle ein neues Diagramm
+            window['dfChart' + i] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Deployment Frequency'],
+                    datasets: [{
+                        label: 'DF (Deployments pro Monat)',
+                        data: [dfValue],
+                        backgroundColor: '#87cde9',
+                        borderColor: '#87cde9',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100  // Angenommener maximaler Wert für DF
+                        }
+                    }
+                }
+            });
+        }
+    }
+}
+
+function updateLTCDashboard(ltcData) {
+    const ltcChartElements = document.getElementsByClassName('ltcChart');
+
+    for (let i = 0; i < ltcChartElements.length; i++) {
+        const ctx = ltcChartElements[i].getContext('2d');
+
+        // Extrahiere Daten für das Diagramm
+        const labels = ltcData.map(data => data.commit); // Verwende 'commit' für die X-Achse
+        const ltcValues = ltcData.map(data => parseFloat(data.ltc_value)); // Stelle sicher, dass es eine Zahl ist
+
+        // Überprüfe, ob bereits eine Chart-Instanz für dieses Canvas-Element existiert
+        if (window['ltcChart' + i]) {
+            // Aktualisiere das vorhandene Diagramm
+            window['ltcChart' + i].data.labels = labels;
+            window['ltcChart' + i].data.datasets[0].data = ltcValues;
+            window['ltcChart' + i].update();
+        } else {
+            // Erstelle ein neues Diagramm als Balkendiagramm
+            window['ltcChart' + i] = new Chart(ctx, {
+                type: 'line', // Ändere den Typ zu 'bar'
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Lead Time for Changes (Stunden)',
+                        data: ltcValues,
+                        fill: false,
+                        borderColor: '#65a95f',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'LTC (Stunden)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+}
+
+
+
+
 
 // Verwendet beim Laden der Seite und auch wenn neue Daten abgerufen werden
 document.getElementById('fetch_project_data').addEventListener('click', function () {
@@ -353,8 +486,8 @@ function updateCFRChart(cfr) {
             datasets: [{
                 label: 'CFR (%)',
                 data: [cfr],
-                backgroundColor: '#216b73',
-                borderColor: '#216b73',
+                backgroundColor: '#800080',
+                borderColor: '#800080',
                 borderWidth: 1
             }]
         },
@@ -392,8 +525,8 @@ function updateDFChart(dfData) {
                 datasets: [{
                     label: 'Deployments pro Monat',
                     data: dfData.deployments,
-                    backgroundColor: '#216b73',
-                    borderColor: '#216b73',
+                    backgroundColor: '#87cde9',
+                    borderColor: '#87cde9',
                     borderWidth: 1
                 }]
             },
@@ -456,6 +589,53 @@ document.getElementById("ltcForm").addEventListener("submit", function (event) {
         event.preventDefault();
     }
 });
+
+function updateLTCChart(ltcData) {
+    const ltcChartElement = document.getElementById('ltcBarChart');
+    if (!ltcChartElement) return;
+
+    const ctx = ltcChartElement.getContext('2d');
+
+    // Extrahiere Daten für das Diagramm
+    const labels = ltcData.map(data => data.commit); // oder data.deployment, abhängig von der Struktur deiner Daten
+    const ltcValues = ltcData.map(data => parseFloat(data.ltc_value)); // Stelle sicher, dass es eine Zahl ist
+
+    if (window.ltcChart) {
+        // Aktualisiere das vorhandene Diagramm
+        window.ltcChart.data.labels = labels;
+        window.ltcChart.data.datasets[0].data = ltcValues;
+        window.ltcChart.update();
+    } else {
+        // Erstelle ein neues Diagramm als Balkendiagramm
+        window.ltcChart = new Chart(ctx, {
+            type: 'line', // Ändere den Typ zu 'bar'
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Lead Time for Changes (Stunden)',
+                    data: ltcValues,
+                    fill: false,
+                    borderColor: '#65a95f',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'LTC (Stunden)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+
+
 
 function updateBarChart() {
     // Daten aus den data-* Attributen lesen
@@ -719,13 +899,19 @@ Promise.all([
         // Aktualisieren   hier die Tabellen mit den Daten von alldata
         updateCCVTable(alldata[0]); // Eine  Funktion, um die CCV-Tabelle zu aktualisieren
         updateLTCTable(alldata[1]); // Eine  Funktion, um die LTC-Tabelle zu aktualisieren
+        const ltcData = alldata[1]; 
+            updateLTCChart(alldata[1]);
+            updateLTCDashboard(ltcData);
         updateMTTRTable(alldata[2].data);
         updateMTTRValue(alldata[2].mttr);
         updateMTTRDisplay(alldata[2].data);
         updateCFRDisplay(alldata[3]); // Ihre neue Funktion, um die CFR anzuzeigen
         const cfr = alldata[3].cfr;
         updateCFRChart(cfr);
+        updateCFRDashboard(cfr);
         updateDFChart(alldata[4]);
+        const df = alldata[4].df;
+        updateDFDashboard(df);
         document.getElementById('dfValue').textContent = alldata[4].df;
         // ... weitere Funktionen, um andere Tabellen zu aktualisieren
 

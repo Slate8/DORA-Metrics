@@ -1,10 +1,10 @@
 # Details
 
-Date : 2023-11-08 08:47:13
+Date : 2023-12-13 09:58:47
 
 Directory /Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics
 
-Total : 27 files,  1427 codes, 333 comments, 387 blanks, all 2147 lines
+Total : 30 files,  2206 codes, 374 comments, 574 blanks, all 3154 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -12,12 +12,8 @@ Total : 27 files,  1427 codes, 333 comments, 387 blanks, all 2147 lines
 | filename | language | code | comment | blank | total |
 | :--- | :--- | ---: | ---: | ---: | ---: |
 | [README.md](/README.md) | Markdown | 14 | 0 | 11 | 25 |
-| [add_metric.py](/add_metric.py) | Python | 38 | 2 | 9 | 49 |
-| [add_project.py](/add_project.py) | Python | 16 | 0 | 5 | 21 |
-| [add_user.py](/add_user.py) | Python | 16 | 0 | 5 | 21 |
 | [db.py](/db.py) | Python | 2 | 0 | 2 | 4 |
-| [delete_db.py](/delete_db.py) | Python | 30 | 0 | 7 | 37 |
-| [main.py](/main.py) | Python | 292 | 70 | 88 | 450 |
+| [main.py](/main.py) | Python | 339 | 82 | 117 | 538 |
 | [migrations/alembic.ini](/migrations/alembic.ini) | Ini | 38 | 0 | 13 | 51 |
 | [migrations/env.py](/migrations/env.py) | Python | 54 | 34 | 26 | 114 |
 | [migrations/versions/0a21c3da577f_.py](/migrations/versions/0a21c3da577f_.py) | Python | 12 | 12 | 9 | 33 |
@@ -33,10 +29,17 @@ Total : 27 files,  1427 codes, 333 comments, 387 blanks, all 2147 lines
 | [migrations/versions/d60e16d204f8_.py](/migrations/versions/d60e16d204f8_.py) | Python | 14 | 12 | 9 | 35 |
 | [migrations/versions/f773ac403d7e_.py](/migrations/versions/f773ac403d7e_.py) | Python | 19 | 12 | 7 | 38 |
 | [models.py](/models.py) | Python | 49 | 1 | 9 | 59 |
-| [static/css/loginStyle.css](/static/css/loginStyle.css) | CSS | 48 | 0 | 4 | 52 |
-| [static/js/main.js](/static/js/main.js) | JavaScript | 239 | 55 | 45 | 339 |
-| [templates/edit_ltc.html](/templates/edit_ltc.html) | HTML | 48 | 3 | 11 | 62 |
-| [templates/index.html](/templates/index.html) | HTML | 283 | 23 | 46 | 352 |
-| [templates/login.html](/templates/login.html) | HTML | 51 | 1 | 6 | 58 |
+| [oldscripts/add_metric.py](/oldscripts/add_metric.py) | Python | 38 | 2 | 9 | 49 |
+| [oldscripts/add_project.py](/oldscripts/add_project.py) | Python | 16 | 0 | 5 | 21 |
+| [oldscripts/add_user.py](/oldscripts/add_user.py) | Python | 16 | 0 | 5 | 21 |
+| [oldscripts/delete_db.py](/oldscripts/delete_db.py) | Python | 30 | 0 | 7 | 37 |
+| [static/css/loginStyle.css](/static/css/loginStyle.css) | CSS | 63 | 0 | 7 | 70 |
+| [static/css/mainStyle.css](/static/css/mainStyle.css) | CSS | 175 | 9 | 33 | 217 |
+| [static/js/main.js](/static/js/main.js) | JavaScript | 578 | 55 | 103 | 736 |
+| [templates/edit_ccv.html](/templates/edit_ccv.html) | HTML | 32 | 1 | 9 | 42 |
+| [templates/edit_ltc.html](/templates/edit_ltc.html) | HTML | 52 | 3 | 12 | 67 |
+| [templates/index.html](/templates/index.html) | HTML | 375 | 37 | 83 | 495 |
+| [templates/login.html](/templates/login.html) | HTML | 87 | 4 | 14 | 105 |
+| [views/auth.py](/views/auth.py) | Python | 39 | 2 | 9 | 50 |
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)

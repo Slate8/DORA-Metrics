@@ -146,6 +146,20 @@ p {
 #dropdownMenuButton{
     margin-left: 2em;
 }
+
+.dasboardCharts {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.dasboardCharts > div {
+    flex: 1 1 50%; 
+    box-sizing: border-box; 
+    padding: 10px; 
+}
+
+
+
 /* Media Queries */
 @media only screen and (max-width: 1080px) {
     /* Anpassungen für kleinere Bildschirme */

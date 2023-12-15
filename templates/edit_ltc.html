@@ -23,13 +23,15 @@
         <!-- Commit Datum und Uhrzeit -->
         <div class="form-group">
             <label for="editCommitDatetime">Commit Datum und Uhrzeit:</label>
-            <input type="datetime-local" class="form-control" id="editCommitDatetime" name="commit_datetime" value="{{ ltc.commit_datetime.isoformat() }}">
+            <input type="datetime-local" class="form-control" id="editCommitDatetime" name="commit_datetime"
+                value="{{ ltc.commit_datetime.isoformat() }}">
         </div>
 
         <!-- Deployment Datum und Uhrzeit -->
         <div class="form-group">
             <label for="editDeploymentDatetime">Deployment Datum und Uhrzeit:</label>
-            <input type="datetime-local" class="form-control" id="editDeploymentDatetime" name="deployment_datetime" value="{{ ltc.deployment_datetime.isoformat() }}">
+            <input type="datetime-local" class="form-control" id="editDeploymentDatetime" name="deployment_datetime"
+                value="{{ ltc.deployment_datetime.isoformat() }}">
         </div>
 
         <div class="input-group mb-3">
@@ -37,19 +39,22 @@
                 <label class="input-group-text" for="editInputGroupSelect01">Erfassung für das Projekt:</label>
             </div>
             <select id="editLtcprojectSelector" name="project_id" class="custom-select">
-                <option value="all" {% if ltc.projekt_id == None %}selected{% endif %}>Alle Projekte</option>
+                <option value="all" {% if ltc.projekt_id==None %}selected{% endif %}>Alle Projekte</option>
                 {% for project in projects %}
-                <option value="{{ project.id }}" {% if ltc.projekt_id == project.id %}selected{% endif %}>{{ project.name }}</option>
+                <option value="{{ project.id }}" {% if ltc.projekt_id==project.id %}selected{% endif %}>{{ project.name
+                    }}</option>
                 {% endfor %}
             </select>
         </div>
 
         <div>
             <label>Deployment Status:</label>
-            <input type="radio" id="editSuccess" name="deployment_status" value="true" {% if ltc.deployment_successful %}checked{% endif %}>
+            <input type="radio" id="editSuccess" name="deployment_status" value="true" {% if ltc.deployment_successful
+                %}checked{% endif %}>
             <label for="editSuccess">Erfolgreich</label>
-            
-            <input type="radio" id="editFailure" name="deployment_status" value="false" {% if not ltc.deployment_successful %}checked{% endif %}>
+
+            <input type="radio" id="editFailure" name="deployment_status" value="false" {% if not
+                ltc.deployment_successful %}checked{% endif %}>
             <label for="editFailure">Fehlgeschlagen</label>
         </div>
 

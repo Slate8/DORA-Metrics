@@ -54,31 +54,31 @@
         </div>
     </div>
 
-  <!-- Registrierungsmodal -->
-<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="registerModalLabel">Neuen Account erstellen</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form class="register-form" method="POST" action="{{ url_for('auth.register') }}">
-                    {% if register_error %}
-                    <div class="alert alert-danger">
-                        {{ register_error }}
-                    </div>
-                    {% endif %}
-                    <input type="text" id="new_username" name="new_username" placeholder="Benutzername" required>
-                    <input type="password" id="new_password" name="new_password" placeholder="Passwort" required>
-                    <button type="submit" class="btn btn-primary">Registrieren</button>
-                </form>
+    <!-- Registrierungsmodal -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Neuen Account erstellen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="register-form" method="POST" action="{{ url_for('auth.register') }}">
+                        {% if register_error %}
+                        <div class="alert alert-danger">
+                            {{ register_error }}
+                        </div>
+                        {% endif %}
+                        <input type="text" id="new_username" name="new_username" placeholder="Benutzername" required>
+                        <input type="password" id="new_password" name="new_password" placeholder="Passwort" required>
+                        <button type="submit" class="btn btn-primary">Registrieren</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Auslagern in JS -->
+    <!-- Auslagern in JS -->
     {% if error %}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -97,7 +97,7 @@
         });
     </script>
     {% endif %}
-    
+
 
 
 </body>

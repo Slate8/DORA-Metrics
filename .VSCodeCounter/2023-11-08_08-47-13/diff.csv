@@ -1,7 +1,0 @@
-"filename", "language", "HTML", "Python", "JavaScript", "CSS", "comment", "blank", "total"
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/main.py", "Python", 0, 46, 0, 0, 6, 8, 60
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/static/css/loginStyle.css", "CSS", 0, 0, 0, 48, 0, 4, 52
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/static/js/main.js", "JavaScript", 0, 0, 25, 0, 1, 0, 26
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/index.html", "HTML", 3, 0, 0, 0, 0, 2, 5
-"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/login.html", "HTML", 9, 0, 0, 0, 0, 0, 9
-"Total", "-", 12, 46, 25, 48, 7, 14, 152
