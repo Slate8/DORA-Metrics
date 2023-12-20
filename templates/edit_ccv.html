@@ -16,7 +16,7 @@
 </head>
 
 <div class="container mt-5">
-    <h2>Code Change Volume Bearbeitung</h2>
+    <h2>Code Change Volume Editing</h2>
 
 
     <form class="container" method="POST" action="{{ url_for('update_ccv', ccv_id=metric.id) }}">
@@ -31,7 +31,7 @@
                 value="{{ metric.code_change_volume }}">
         </div>
 
-        <button type="submit" class="btn btn-primary">Änderungen speichern</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
     </form>
 </div>
 

@@ -13,6 +13,7 @@ class CD_METRIK(db.Model):
     name = db.Column(db.String(200), nullable=False)
     # muss noch gelöscht werden oder angepasst
     value = db.Column(db.Float, nullable=True)
+    commit_datetime = db.Column(db.DateTime, nullable=True) 
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     code_change_volume = db.Column(db.Float, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey(

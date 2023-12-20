@@ -135,7 +135,7 @@
 
 
         <select id="projectSelector" name="project_id" class="custom-select m-1">
-            <option value="all" {% if current_project_id=='all' %}selected{% endif %}>Alle Projekte
+            <option value="all" {% if current_project_id=='all' %}selected{% endif %}>All projects
             </option>
             {% for project in projects %}
             <option value="{{ project.id }}" {% if current_project_id==project.id|string %}selected{% endif %}>
@@ -143,7 +143,7 @@
             {% endfor %}
         </select>
         <div class="input-group-append m-1">
-            <button class="btn btn-primary" type="button" id="fetch_project_data">Daten abrufen</button>
+            <button class="btn btn-primary" type="button" id="fetch_project_data">Retrieve data</button>
 
         </div>
 
@@ -155,7 +155,7 @@
         <div class="tab-pane active" id="dashboard">
             <!--  Dashboard-Inhalt -->
             <h2>Dashboard</h2>
-            <p>Hier kommen die Canvas- und Chart-Übersichten hin.</p>
+            <p>Overview of your projects</p>
             <!--  Canvas und Charts -->
             <div class="dasboardCharts">
 
@@ -190,13 +190,20 @@
 
                 <div class="form-group">
                     <label for="ccvInput">Code Change Volume:</label>
-                    <p>Anzahl hinzugefügter, geänderter und gelöschter Zeilen eingeben</p>
+                    <p>Enter the number of added, changed and deleted code lines</p>
+                   
                     <div class="col-md-6">
-                        <input class="form-control mt-2" id="ccvInput" name="ccvValue">
+                        <input type="datetime-local" class="form-control mt-2" id="commitDateTimeInput" name="commit_ccv_datetime">
                     </div>
+                
+                    <div class="col-md-6">
+                        <input type="number" class="form-control mt-2" id="ccvInput" name="ccvValue">
+                    </div>
+
+
                 </div>
                 <input type="hidden" id="hiddenProjectId" name="project_id" value="">
-                <button type="submit" class="btn btn-primary mt-2">Absenden</button>
+                <button type="submit" class="btn btn-primary mt-2">submit</button>
             </form>
             <div class="row mt-4">
                 <div class="col-md-6">
@@ -205,7 +212,7 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th class="text-center">Timestamp</th>
+                                    <th class="text-center">Commit</th>
                                     <th class="text-center">Code Change Volume</th>
                                     <th class="text-center">User</th>
                                     <th class="text-center">Projekt</th>
@@ -215,7 +222,7 @@
                             <tbody id="ccvDataBody">
                                 {% for metric in ccv_data %}
                                 <tr>
-                                    <td class="text-center">{{ metric.timestamp.strftime('%H:%M %d.%m.%Y') }}</td>
+                                    <td class="text-center"> {{ metric.commit_datetime.strftime('%H:%M %d.%m.%Y') if metric.commit_datetime else 'N/A' }}</td>
                                     <td class="text-center">{{ metric.code_change_volume | int}}</td>
                                     <td class="text-center">{{ metric.user.username }}</td>
                                     <td class="text-center">{{ metric.projekt.name }}</td>
@@ -256,7 +263,7 @@
                 </div>
 
                 <div>
-                    <h3>Gesammtausfallzeit in Minuten</h3>
+                    <h3>Downtime in minutes</h3>
                     <canvas id="mttrRingChart"></canvas>
                 </div>
 
@@ -266,11 +273,10 @@
             <div class="container">
                 <div class="row">
 
-                    <p>Die Mean Time To Recover (MTTR) beträgt: <span id="mttrDisplay">Zum abrufen der MTTR "Daten
-                            abrufen" klicken</span></p>
+                    <p>The Mean Time To Recover (MTTR) is: <span id="mttrDisplay">To retrieve the MTTR, click on "Retrieve data"</span></p>
 
 
-                    <p>Hier kannst du die Details für einen Vorfall eingeben:</p>
+                    <p>Here you can enter the details for an incident:</p>
 
 
 
@@ -280,7 +286,7 @@
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="incidentModalLabel">Neuer Vorfall</h5>
+                                    <h5 class="modal-title" id="incidentModalLabel">New incident</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
@@ -291,37 +297,37 @@
                                         <form method="POST" action="/submit_mttr">
                                             <!-- Startzeit des Vorfalls -->
                                             <div class="form-group">
-                                                <label for="start_timeInput">Startzeit des Vorfalls:</label>
+                                                <label for="start_timeInput">Start time of the incident:</label>
                                                 <input type="datetime-local" class="form-control" id="start_timeInput"
                                                     name="start_time">
                                             </div>
                                             <!-- Endzeit des Vorfalls -->
                                             <div class="form-group">
-                                                <label for="end_timeInput">Endzeit des Vorfalls:</label>
+                                                <label for="end_timeInput">End time of the incident:</label>
                                                 <input type="datetime-local" class="form-control" id="end_timeInput"
                                                     name="end_time">
                                             </div>
                                             <!-- Beschreibung des Vorfalls -->
                                             <div class="form-group">
-                                                <label for="descriptionInput">Beschreibung:</label>
+                                                <label for="descriptionInput">Description:</label>
                                                 <textarea class="form-control" id="descriptionInput" name="description"
                                                     rows="3"></textarea>
                                             </div>
                                             <!-- Ursache des Vorfalls -->
                                             <div class="form-group">
-                                                <label for="causeInput">Ursache:</label>
+                                                <label for="causeInput">Cause:</label>
                                                 <textarea class="form-control" id="causeInput" name="cause"
                                                     rows="3"></textarea>
                                             </div>
                                             <!-- Wie wurde das Problem behoben -->
                                             <div class="form-group">
-                                                <label for="resolutionInput">Behebung:</label>
+                                                <label for="resolutionInput">Fixed by:</label>
                                                 <textarea class="form-control" id="resolutionInput" name="resolution"
                                                     rows="3"></textarea>
                                             </div>
                                             <!-- Auswahl des zugehörigen Projekts -->
                                             <div class="form-group">
-                                                <label for="projectSelect">Projekt:</label>
+                                                <label for="projectSelect">Project:</label>
                                                 <select class="form-control" id="projectSelect" name="project_id">
                                                     <!-- Hier sollten die Projekt-Optionen aus der Datenbank geladen werden -->
                                                     {% for project in projects %}
@@ -329,7 +335,7 @@
                                                     {% endfor %}
                                                 </select>
                                             </div>
-                                            <button type="submit" class="btn btn-primary">Absenden</button>
+                                            <button type="submit" class="btn btn-primary">submit</button>
                                         </form> <!-- Hier kommen die Formularfelder -->
                                         <!-- ... -->
 
@@ -346,10 +352,10 @@
                             <!-- Tabellenkopf -->
                             <thead>
                                 <tr>
-                                    <th>Startzeit</th>
-                                    <th>Endzeit</th>
-                                    <th>Beschreibung</th>
-                                    <th>Projekt</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Description</th>
+                                    <th>Project</th>
                                 </tr>
                             </thead>
                             <!-- Tabellenkörper -->
@@ -374,18 +380,18 @@
 
 
         <div class="tab-pane container" id="changeFailureRate">
-            <h2>Change Failure Rate Berechnung</h2>
+            <h2>Change Failure Rate Calculation</h2>
 
             <div>
-                <label>Anzahl der fehlgeschlagenen Deployments: </label>
+                <label>Number of failed deployments: </label>
                 <span id="failed">{{ failed }}</span>
                 <br>
-                <label>Gesamtzahl der Deployments: </label>
+                <label>Total number of deployments: </label>
                 <span id="total">{{ total }}</span>
 
             </div>
 
-            <p>Die aktuelle Change Failure Rate für das ausgewählte Projekt beträgt: <strong><span id="cfrDisplay">{{
+            <p>The current change failure rate for the selected project is: <strong><span id="cfrDisplay">{{
                         '%.2f'|format(cfr) }}%</span></strong></p>
 
             <div>
@@ -399,8 +405,8 @@
             <!-- Deployment  -->
             <div class="container mt-4">
                 <h3>Deployment Frequency (DF)</h3>
-                <p id="deploymentFrequency">Die aktuelle Deployment Frequency für das ausgewählte Projekt beträgt:
-                    <strong id="dfValue">{{ df }}</strong> Deployments pro Monat.
+                <p id="deploymentFrequency">The current deployment frequency for the selected project is:
+                    <strong id="dfValue">{{ df }}</strong> Deployments per month.
                 </p>
                 <div id="chartData" style="width:100%;max-width:600px"
                     data-months='{{ months|tojson|replace("\"", "&quot;") }}'
@@ -415,32 +421,31 @@
 
 
         <div class="tab-pane" id="leadTimeForChange">
-            <h2>Lead Time for Changes Erfassung</h2>
+            <h2>Lead Time for Changes Capturing</h2>
             <div class="dasboardCharts">
                 <!-- Formular zum Erfassen von Commit- und Deployment-Daten -->
                 <div>
                     <form id="ltcForm" method="POST" action="/submit_ltc">
                         <!-- Commit Datum und Uhrzeit -->
                         <div class="form-group">
-                            <label for="commitDatetime">Commit Datum und Uhrzeit:</label>
+                            <label for="commitDatetime">Commit date and time:</label>
                             <input type="datetime-local" class="form-control" id="commitDatetime"
                                 name="commit_datetime">
                         </div>
 
                         <!-- Deployment Datum und Uhrzeit -->
                         <div class="form-group">
-                            <label for="deploymentDatetime">Deployment Datum und Uhrzeit:</label>
+                            <label for="deploymentDatetime">Deployment date and time:</label>
                             <input type="datetime-local" class="form-control" id="deploymentDatetime"
                                 name="deployment_datetime">
                         </div>
 
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <label class="input-group-text" for="inputGroupSelect01">Erfassug für das
-                                    Projekt:</label>
+                                <label class="input-group-text" for="inputGroupSelect01">Recording for the project:</label>
                             </div>
                             <select id="ltcprojectSelector" name="project_id" class="custom-select">
-                                <option value="all">Alle Projekte</option>
+                                <option value="all">All projects</option>
                                 {% for project in projects %}
                                 <option value="{{ project.id }}">{{ project.name }}</option>
                                 {% endfor %}
@@ -449,15 +454,15 @@
 
 
                         <div>
-                            <label>Deployment Status:</label>
+                            <label>Deployment status:</label>
                             <input type="radio" id="success" name="deployment_status" value="true" checked>
-                            <label for="success">Erfolgreich</label>
+                            <label for="success">Successful</label>
 
                             <input type="radio" id="failure" name="deployment_status" value="false">
-                            <label for="failure">Fehlgeschlagen</label>
+                            <label for="failure">Failed</label>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Erfassung absenden</button>
+                        <button type="submit" class="btn btn-primary">Send capture</button>
                     </form>
                 </div>
 
@@ -472,8 +477,8 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th class="text-center">Commit Datum</th>
-                                <th class="text-center">Deployment Datum</th>
+                                <th class="text-center">Commit date</th>
+                                <th class="text-center">Deployment date</th>
                                 <th class="text-center">Lead Time</th>
                                 <th class="text-center">Deploy Succesfull</th>
                                 <th class="text-center">Actions</th>

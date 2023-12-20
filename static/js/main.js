@@ -199,7 +199,7 @@ function updateCCVTable(data) {
     // Erstellen   neue Tabellenzeilen mit den abgerufenen Daten
     data.forEach(metric => {
         var row = tbody.insertRow();
-        row.innerHTML = `<td class="text-center">${metric.timestamp}</td>
+        row.innerHTML = `<td class="text-center">${metric.commit_datetime}</td>
                          <td class="text-center">${metric.code_change_volume}</td>
                          <td class="text-center">${metric.user}</td>
                          <td class="text-center">${metric.projekt}</td>
@@ -693,9 +693,36 @@ function updateBarChart() {
 
 
 
+function setupProjectForm() {
+    var newProjectForm = document.getElementById('newProjectForm');
 
+    newProjectForm.addEventListener('submit', function (event) {
+        event.preventDefault(); // Verhindert das normale Senden des Formulars
 
-document.addEventListener('DOMContentLoaded', function () {
+        var formData = new FormData(this);
+
+        fetch('/create_project', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayMessage(data.message, 'success'); // Erfolgsmeldung
+                    $('#createProjectModal').modal('hide'); // Schließt das Modal
+
+                } else {
+                    displayMessage(data.message, 'error'); // Fehlermeldung
+                }
+            })
+            .catch(error => {
+                console.error('Fehler beim Senden des Formulars:', error);
+                displayMessage('Ein Fehler ist aufgetreten', 'error');
+            });
+    });
+}
+
+/*document.addEventListener('DOMContentLoaded', function () {
     var newProjectForm = document.getElementById('newProjectForm');
 
     newProjectForm.addEventListener('submit', function (event) {
@@ -723,37 +750,77 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 });
+*/
 
-function displayMessage(message, type) {
-    var messageBox = document.createElement('div');
-    messageBox.textContent = message;
-    messageBox.className = type === 'success' ? 'alert alert-success' : 'alert alert-danger';
-    messageBox.style.position = 'fixed';
-    messageBox.style.bottom = '20px';
-    messageBox.style.right = '20px';
-    messageBox.style.zIndex = '1000';
+function initializeMTTRChart() {
+    fetch('/get_mttr_data')
+    .then(response => response.json())
+    .then(data => {
+        const ctx = document.getElementById('mttrChart').getContext('2d');
+        const projectNames = [...new Set(data.data.map(incident => incident.project))];
+        const labels = [...new Set(data.data.map(incident => incident.starttime))];
 
-    document.body.appendChild(messageBox);
+        // Initialisieren der Datenstruktur für jedes Projekt mit Nullen
+        const projectData = projectNames.reduce((acc, projectName) => {
+            acc[projectName] = labels.map(() => null); // Starten mit null für jede Zeitmarke
+            return acc;
+        }, {});
 
-    // Meldung nach ein paar Sekunden ausblenden
-    setTimeout(function () {
-        messageBox.remove();
-    }, 3000);
+        // Füllen der tatsächlichen Daten für jedes Projekt
+        data.data.forEach(incident => {
+            const projectName = incident.project;
+            const labelIndex = labels.indexOf(incident.starttime);
+            const start = parseDate(incident.starttime);
+            const end = parseDate(incident.endtime);
+            const duration = (end - start) / 1000 / 3600;
+            projectData[projectName][labelIndex] = parseFloat(duration.toFixed(2));
+        });
+
+        // Erstellen eines Datasets für jedes Projekt
+        const datasets = projectNames.map((projectName, index) => {
+            const color = predefinedColors[index % predefinedColors.length];
+            return {
+                label: projectName,
+                data: projectData[projectName],
+                // Farben dynamisch zuweisen, je nach Anzahl der Projekte
+                backgroundColor: color, 
+                borderColor: color, 
+                borderWidth: 1
+            };
+        });
+
+        // Erstellen des Diagramms
+        const mttrChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels, 
+                datasets: datasets
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Dauer (Stunden)'
+                        }
+                    }
+                },
+                plugins: {
+
+                    title: {
+                        display: true,
+                        text: `MTTR: ${data.mttr}`
+                    }
+                }
+            }
+        });
+    });
 }
 
-function parseDate(dateStr) {
-    // Zerlegen des Strings in seine Bestandteile
-    const [time, date] = dateStr.split(' ');
-    const [hours, minutes] = time.split(':').map(part => parseInt(part, 10));
-    const [day, month, year] = date.split('.').map(part => parseInt(part, 10));
-
-    // Erstellen eines neuen Date-Objekts
-    
-
-    return new Date(year, month - 1, day, hours, minutes);
-}
-
-document.addEventListener('DOMContentLoaded', function () {
+/*document.addEventListener('DOMContentLoaded', function () {
     fetch('/get_mttr_data')
         .then(response => response.json())
         .then(data => {
@@ -820,9 +887,96 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 });
+*/
+
+function displayMessage(message, type) {
+    var messageBox = document.createElement('div');
+    messageBox.textContent = message;
+    messageBox.className = type === 'success' ? 'alert alert-success' : 'alert alert-danger';
+    messageBox.style.position = 'fixed';
+    messageBox.style.bottom = '20px';
+    messageBox.style.right = '20px';
+    messageBox.style.zIndex = '1000';
+
+    document.body.appendChild(messageBox);
+
+    // Meldung nach ein paar Sekunden ausblenden
+    setTimeout(function () {
+        messageBox.remove();
+    }, 3000);
+}
+
+function parseDate(dateStr) {
+    // Zerlegen des Strings in seine Bestandteile
+    const [time, date] = dateStr.split(' ');
+    const [hours, minutes] = time.split(':').map(part => parseInt(part, 10));
+    const [day, month, year] = date.split('.').map(part => parseInt(part, 10));
+
+    // Erstellen eines neuen Date-Objekts
+    
+
+    return new Date(year, month - 1, day, hours, minutes);
+}
 
 
-document.addEventListener('DOMContentLoaded', function () {
+function initializeMTTRDoughnutChart() {
+    fetch('/get_mttr_data')
+    .then(response => response.json())
+    .then(data => {
+        // Aggregieren der MTTR-Daten für jedes Projekt
+        const mttrByProject = {};
+        data.data.forEach(incident => {
+            const projectName = incident.project;
+            const start = new Date(parseDate(incident.starttime));
+            const end = new Date(parseDate(incident.endtime));
+
+            const duration = (end - start) / 1000 / 60; // Dauer in Minuten
+            if (mttrByProject[projectName]) {
+                mttrByProject[projectName] += duration;
+            } else {
+                mttrByProject[projectName] = duration;
+            }
+        });
+
+        // Definiere ein Array von Farben
+        const colors = predefinedColors;
+        const backgroundColors = Object.keys(mttrByProject).map((_, index) => colors[index % colors.length]);
+
+        // Erstellen der Datenstruktur für das Chart.js-Diagramm
+        const mttrData = {
+            labels: Object.keys(mttrByProject),
+            datasets: [{
+                label: 'MTTR in Minuten',
+                data: Object.values(mttrByProject),
+                backgroundColor: backgroundColors, // Verwende das Farb-Array für Hintergrundfarben
+                borderColor: backgroundColors, // Verwende das Farb-Array für Randfarben
+                borderWidth: 1
+            }]
+        };
+
+        // Erstellen des Doughnut-Charts
+        const ctx = document.getElementById('mttrRingChart').getContext('2d');
+        const mttrRingChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: mttrData,
+            options: {
+                responsive: false,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'MTTR für Projekte (in Minuten)'
+                    }
+                }
+            }
+        });
+    })
+    .catch(error => console.error('Fehler beim Abrufen der MTTR-Daten', error));
+}
+/*document.addEventListener('DOMContentLoaded', function () {
     fetch('/get_mttr_data')
         .then(response => response.json())
         .then(data => {
@@ -878,9 +1032,52 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         })
         .catch(error => console.error('Fehler beim Abrufen der MTTR-Daten', error));
-});
+});*/
 
-document.addEventListener('DOMContentLoaded', function () {
+
+function fetchDataForCharts(){
+    var projectId = document.getElementById('projectSelector').value;
+    // Starten   einen Fetch für jede Datenquelle
+    Promise.all([
+        fetch('/get_cd_metric_data?project_id=' + projectId).then(response => response.json()),
+        fetch('/get_ltc_data?project_id=' + projectId).then(response => response.json()),
+        fetch('/get_mttr_data?project_id=' + projectId).then(response => response.json()),
+        fetch('/get_cfr_data?project_id=' + projectId).then(response => response.json()),
+        fetch('/get_df_data?project_id=' + projectId).then(response => response.json()),
+        // ... fügen   hier weitere fetch Aufrufe für andere Datenquellen hinzu
+    ])
+        .then(alldata => {
+            // alldata[0] enthält die Antwort von '/get_cd_metric_data'
+            // alldata[1] enthält die Antwort von '/get_ltc_data'
+            // ... und so weiter für weitere Antworten
+    
+            // Aktualisieren   hier die Tabellen mit den Daten von alldata
+            updateCCVTable(alldata[0]); // Eine  Funktion, um die CCV-Tabelle zu aktualisieren
+            updateLTCTable(alldata[1]); // Eine  Funktion, um die LTC-Tabelle zu aktualisieren
+            const ltcData = alldata[1]; 
+                updateLTCChart(alldata[1]);
+                updateLTCDashboard(ltcData);
+            updateMTTRTable(alldata[2].data);
+            updateMTTRValue(alldata[2].mttr);
+            updateMTTRDisplay(alldata[2].data);
+            updateCFRDisplay(alldata[3]); // Ihre neue Funktion, um die CFR anzuzeigen
+            const cfr = alldata[3].cfr;
+            updateCFRChart(cfr);
+            updateCFRDashboard(cfr);
+            updateDFChart(alldata[4]);
+            const df = alldata[4].df;
+            updateDFDashboard(df);
+            document.getElementById('dfValue').textContent = alldata[4].df;
+            // ... weitere Funktionen, um andere Tabellen zu aktualisieren
+    
+            // Nach dem Aktualisieren der Tabellen rufen   updateCharts erneut auf
+            updateCharts();
+        })
+        .catch(error => console.error('Fehler beim Abrufen der Daten:', error));
+
+}
+
+/*document.addEventListener('DOMContentLoaded', function () {
 var projectId = document.getElementById('projectSelector').value;
 // Starten   einen Fetch für jede Datenquelle
 Promise.all([
@@ -919,4 +1116,43 @@ Promise.all([
         updateCharts();
     })
     .catch(error => console.error('Fehler beim Abrufen der Daten:', error));
+});*/
+
+//Speicherung des aktuellen Bereichs der Dateneingabe
+document.querySelectorAll('#metricTabs .nav-link').forEach(link => {
+    link.addEventListener('click', function() {
+        localStorage.setItem('activeTab', this.getAttribute('href'));
+    });
 });
+
+function  setupTabMemory() {
+    const activeTab = localStorage.getItem('activeTab');
+    if (activeTab) {
+        const tabToActivate = document.querySelector(`#metricTabs .nav-link[href="${activeTab}"]`);
+        if (tabToActivate) {
+            tabToActivate.click();
+        }
+    }
+
+}
+/*
+document.addEventListener('DOMContentLoaded', () => {
+    const activeTab = localStorage.getItem('activeTab');
+    if (activeTab) {
+        const tabToActivate = document.querySelector(`#metricTabs .nav-link[href="${activeTab}"]`);
+        if (tabToActivate) {
+            tabToActivate.click();
+        }
+    }
+});*/
+
+document.addEventListener('DOMContentLoaded', function () {
+    setupProjectForm();
+    initializeMTTRChart();
+    initializeMTTRDoughnutChart();
+    fetchDataForCharts();
+
+    setupTabMemory();
+    // Weitere Initialisierungen...
+});
+

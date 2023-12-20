@@ -1,0 +1,7 @@
+"filename", "language", "HTML", "JavaScript", "CSS", "comment", "blank", "total"
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/static/css/mainStyle.css", "CSS", 0, 0, 9, 0, 5, 14
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/static/js/main.js", "JavaScript", 0, 151, 0, 14, 21, 186
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/edit_ccv.html", "HTML", 2, 0, 0, -1, 1, 2
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/edit_ltc.html", "HTML", 5, 0, 0, 0, 0, 5
+"/Users/tobiastrentzsch/Desktop/Beuth Medieninformatik/Formales/Bachelorarbeit/DORA-Metrik/DORA-Metrics/templates/index.html", "HTML", 24, 0, 0, 0, 3, 27
+"Total", "-", 31, 151, 9, 13, 30, 234

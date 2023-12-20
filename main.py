@@ -130,7 +130,8 @@ def get_cd_metric_data():
             'id': metric.id,
             'name': metric.name,
             'value': metric.value,
-            'timestamp': metric.timestamp.strftime('%H:%M %d.%m.%Y'),
+           # 'timestamp': metric.timestamp.strftime('%H:%M %d.%m.%Y')if metric.timestamp else 'N/A',
+            'commit_datetime': metric.commit_datetime.strftime('%H:%M %d.%m.%Y') if metric.commit_datetime else 'N/A',
             'code_change_volume': metric.code_change_volume,
             'user_id': metric.user_id,
             'user': metric.user.username,
@@ -243,19 +244,28 @@ def submit_ccv():
     # Die eingegebene Zahl aus dem Formular abrufen
     ccv_value = request.form["ccvValue"]
     selected_project_id = request.form["project_id"]
+    commit_datetime_str = request.form.get("commit_ccv_datetime")
+    commit_datetime = datetime.strptime(commit_datetime_str, "%Y-%m-%dT%H:%M")
+
 
     # Überprüfen , ob selected_project_id "all" ist und behandeln  diesen Fall entsprechend (z. B. indem  ihn auf None setzen oder einen Fehler ausgeben)
     if selected_project_id == "all":
         selected_project_id = None
 
     # Speichere ccv_value und selected_project_id in der Datenbank
-    new_metric = CD_METRIK(name="Code Change Volume", code_change_volume=ccv_value,
-                           user_id=current_user.id, projekt_id=selected_project_id)
+    new_metric = CD_METRIK(
+        name="Code Change Volume",
+        code_change_volume=ccv_value,
+        user_id=current_user.id,
+        projekt_id=selected_project_id,
+        commit_datetime=commit_datetime  # Setze das übergebene Datum und Zeit
+    )
     db.session.add(new_metric)
     db.session.commit()
 
     # Nach dem Absenden zur Startseite weiterleiten
     return redirect(url_for("start_page"))
+
 
 
 @app.route("/submit_mttr", methods=["POST"])
