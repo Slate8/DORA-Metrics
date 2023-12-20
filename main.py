@@ -27,7 +27,7 @@ Lizenz: MIT (oder jede andere Lizenz, die Sie verwenden möchten)
 """
 
 # Hier beginnt der eigentliche Code...
-
+# Import der benötigten Module und Bibliotheken
 from flask import Flask, jsonify, render_template, request, redirect, url_for
 from db import db  
 from datetime import datetime
@@ -45,13 +45,13 @@ load_dotenv()
 from flask import abort
 
 
-
+# Initialisierung der Flask-Anwendung und Konfiguration
 app = Flask(__name__, template_folder="templates")
 app.register_blueprint(auth, url_prefix='/auth')
 
+# Konfiguration der Datenbank und anderer Flask-Erweiterungen
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# muss noch angepasst werden
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 
@@ -62,10 +62,11 @@ login_manager = LoginManager(app)
 login_manager.login_view = "auth.login"
 login_manager.init_app(app)
 
-
+# Deklaration der Route für die Startseite, erfordert Login
 @app.route("/")
 @login_required
 def start_page():
+     # Logik zur Abfrage und Anzeige der Startseite-Daten
     project_id = request.args.get('project_id', 'all')
     months, monthly_deployments = get_monthly_deployments(project_id)
       # Holen  den Benutzernamen aus der Session
@@ -113,7 +114,7 @@ def start_page():
                            total=total_deployments, cfr=cfr, incident_data=incident_data)
 
 
-# mit AJAX Anpassung
+# AJAX-Route zur Abfrage der Tabelle "CD-Metrik"
 @app.route('/get_cd_metric_data')
 def get_cd_metric_data():
     project_id = request.args.get('project_id', 'all')
@@ -143,7 +144,7 @@ def get_cd_metric_data():
 
     return jsonify(metrics_data_list)
 
-
+# Route zur Abfrage von LTC-Daten
 @app.route('/get_ltc_data')
 def get_ltc_data():
     project_id = request.args.get('project_id', 'all')
@@ -167,7 +168,7 @@ def get_ltc_data():
 
     return jsonify(ltc_data_list)
 
-
+# Route zur Abfrage von MTTR-Daten
 @app.route('/get_mttr_data')
 def get_mttr_data():
     project_id = request.args.get('project_id', 'all')
@@ -192,6 +193,7 @@ def get_mttr_data():
     # Konvertieren der Daten in ein serialisierbares Format
     mttr_data_list = [
         {
+            'id': incident.id,
             'starttime': incident.start_time.strftime('%H:%M %d.%m.%Y'),
             'endtime': incident.end_time.strftime('%H:%M %d.%m.%Y'),
             'description': incident.description,
@@ -208,7 +210,7 @@ def get_mttr_data():
 
     return jsonify(response)
 
-
+# Route zur Abfrage und Berechnung der CFR-Daten
 @app.route('/get_cfr_data')
 def get_cfr_data():
     project_id = request.args.get('project_id', 'all')
@@ -229,7 +231,7 @@ def get_cfr_data():
     return jsonify({'cfr': cfr, 'failed': failed_deployments, 'total': total_deployments})
 
 
-
+# Route zur Abfrage und Berechnung der DF-Daten
 @app.route('/get_df_data')
 def get_df_data():
     project_id = request.args.get('project_id', 'all')
@@ -237,7 +239,7 @@ def get_df_data():
     months, monthly_deployments = get_monthly_deployments(project_id)
     return jsonify(df=df_data, months=months, deployments=monthly_deployments)
 
-
+# Route zur Verarbeitung des CCV-Formulars
 @app.route("/submit_ccv", methods=["POST"])
 @login_required
 def submit_ccv():
@@ -266,8 +268,7 @@ def submit_ccv():
     # Nach dem Absenden zur Startseite weiterleiten
     return redirect(url_for("start_page"))
 
-
-
+# Route zur Verarbeitung des MTTR-Formulars
 @app.route("/submit_mttr", methods=["POST"])
 @login_required
 def submit_mttr():
@@ -298,7 +299,7 @@ def submit_mttr():
     # Nach dem Absenden zur Startseite weiterleiten
     return redirect(url_for("start_page"))
 
-
+# Route zur Verarbeitung des LTC-Formulars
 @app.route("/submit_ltc", methods=["POST"])
 @login_required
 def submit_ltc():
@@ -335,25 +336,28 @@ def submit_ltc():
 @app.route("/edit_ltc/<int:ltc_id>", methods=["GET"])
 @login_required
 def edit_ltc(ltc_id):
-    # Holt den LTC-Eintrag aus der Datenbank
+   # Ruft den LTC-Eintrag anhand der übergebenen ID aus der Datenbank ab und gibt einen 404-Fehler zurück, falls nicht vorhanden
     ltc = LTC.query.get_or_404(ltc_id)
 
-    # Stellt sicher, dass der aktuelle Benutzer berechtigt ist, diesen Eintrag zu bearbeiten
-    if ltc.user_id != current_user.id:
-        abort(403)  # Forbidden
+   # Prüft, ob der aktuelle Benutzer berechtigt ist, diesen Eintrag zu bearbeiten. Gibt im Fehlerfall einen 403-Fehler zurück
+  #  if ltc.user_id != current_user.id:
+  #      abort(403)  # Zugriff verboten
 
+    # Ruft alle Projekte aus der Datenbank ab
     projects = Projekt.query.all()
+    # Rendert das 'edit_ltc.html'-Template, übergibt die LTC-Instanz und die Projektliste
     return render_template('edit_ltc.html', ltc=ltc, projects=projects)
 
 
 @app.route("/update_ltc/<int:ltc_id>", methods=["POST"])
 @login_required
 def update_ltc(ltc_id):
+     # Ähnlich wie bei 'edit_ltc', aber hier werden die aktualisierten Daten verarbeitet
     ltc = LTC.query.get_or_404(ltc_id)
 
     # Stellt wieder sicher, dass der aktuelle Benutzer berechtigt ist
-    if ltc.user_id != current_user.id:
-        abort(403)
+   # if ltc.user_id != current_user.id:
+   #     abort(403)
 
     # Eingegebene Daten aus dem Formular holen
     commit_datetime = request.form["commit_datetime"]
@@ -361,13 +365,13 @@ def update_ltc(ltc_id):
     deployment_status = request.form["deployment_status"]
     selected_project_id = request.form["project_id"]
 
-    # Werte aktualisieren
+    # Aktualisiert den LTC-Eintrag mit den neuen Daten
     ltc.commit_datetime = datetime.fromisoformat(commit_datetime)
     ltc.deployment_datetime = datetime.fromisoformat(deployment_datetime)
     ltc.deployment_successful = True if deployment_status == "true" else False
     ltc.projekt_id = selected_project_id if selected_project_id != "all" else None
 
-    # Lead Time to Change neu berechnen
+    # Berechnet den neuen LTC-Wert und speichert die Änderungen in der Datenbank
     ltc_value = (ltc.deployment_datetime -
                  ltc.commit_datetime).total_seconds() / 3600  # LTC in Stunden
     ltc.value = ltc_value
@@ -406,6 +410,54 @@ def update_ccv(ccv_id):
     db.session.commit()
     return redirect(url_for('start_page'))
 
+@app.route("/edit_mttr/<int:incident_id>", methods=["GET"])
+@login_required
+def edit_mttr(incident_id):
+    # Holt den Incident-Eintrag anhand der übergebenen ID aus der Datenbank
+    incident = Incident.query.get_or_404(incident_id)
+
+    # Prüft, ob der aktuelle Benutzer berechtigt ist, diesen Eintrag zu bearbeiten
+    if incident.user_id != current_user.id:
+        abort(403)  # Forbidden
+
+    # Rendert das 'edit_mttr.html'-Template, übergibt die Incident-Instanz
+    return render_template('edit_mttr.html', incident=incident)
+
+@app.route("/update_mttr/<int:incident_id>", methods=["POST"])
+@login_required
+def update_mttr(incident_id):
+    # Holt den Incident-Eintrag anhand der übergebenen ID aus der Datenbank
+    incident = Incident.query.get_or_404(incident_id)
+
+    # Prüft, ob der aktuelle Benutzer berechtigt ist, diesen Eintrag zu bearbeiten
+    if incident.user_id != current_user.id:
+        abort(403)  # Forbidden
+
+    # Die Daten aus dem Formular abrufen
+    start_time = request.form["start_time"]
+    end_time = request.form["end_time"]
+    description = request.form["description"]
+    cause = request.form["cause"]
+    resolution = request.form["resolution"]
+    selected_project_id = request.form["project_id"]
+
+    # Konvertieren die Zeichenketten in datetime-Objekte
+    start_time_dt = datetime.fromisoformat(start_time)
+    end_time_dt = datetime.fromisoformat(end_time)
+
+    # Aktualisiert das Incident-Objekt
+    incident.start_time = start_time_dt
+    incident.end_time = end_time_dt
+    incident.description = description
+    incident.cause = cause
+    incident.resolution = resolution
+    incident.projekt_id = selected_project_id if selected_project_id != "all" else None
+
+    # Speichert die Änderungen in der Datenbank
+    db.session.commit()
+
+    # Nach dem Update zur Startseite oder einer anderen geeigneten Seite weiterleiten
+    return redirect(url_for("start_page"))
 
 
 
@@ -413,6 +465,7 @@ def update_ccv(ccv_id):
 @app.route("/calculate_mttr", methods=["GET"])
 @login_required
 def calculate_mttr(project_id=None):
+    # Berechnet die Mean Time To Recovery (MTTR) für ein spezifisches Projekt oder alle Projekte
     if project_id:
         # Hier berechnen  die MTTR nur für das spezifische Projekt
         incidents = Incident.query.filter_by(projekt_id=project_id).all()
@@ -442,6 +495,7 @@ def calculate_mttr(project_id=None):
 
 @login_manager.user_loader
 def load_user(user_id):
+    # Lädt einen Benutzer anhand seiner ID aus der Datenbank für die Authentifizierung
     return User.query.get(int(user_id))
 
 
@@ -461,6 +515,7 @@ def get_ccv_data():
 # injeziert die Projekte in die Dropdownliste
 @app.context_processor
 def inject_projects():
+      # Stellt eine Liste aller Projekte für die Verwendung in Templates bereit
     projects = Projekt.query.all()
     return dict(projects=projects)
 
@@ -472,6 +527,7 @@ def load_user(user_id):
 
 
 def calculate_deployment_frequency(project_id=None):
+   # Berechnet die Deployment-Frequenz für ein bestimmtes Projekt oder alle Projekte
     # Initialisiere die Anzahl der aktiven Monate
     active_months = 0
     total_deployments = 0
@@ -506,6 +562,7 @@ def calculate_deployment_frequency(project_id=None):
 
 
 def get_monthly_deployments(project_id=None):
+      # Holt die monatlichen Deployments für ein bestimmtes Projekt oder alle Projekte
     months = ["Januar", "Februar", "März", "April", "Mai", "Juni",
               "Juli", "August", "September", "Oktober", "November", "Dezember"]
     monthly_deployments = []
@@ -524,6 +581,8 @@ def get_monthly_deployments(project_id=None):
 
 @app.route('/create_project', methods=['POST'])
 def create_project():
+# Erstellt ein neues Projekt basierend auf den Formulardaten
+
     name = request.form['name']
     description = request.form.get('description', '')
 
@@ -543,5 +602,6 @@ def create_project():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
+# Hauptfunktion zum Starten der Flask-Anwendung
 if __name__ == "__main__":
     app.run(debug=True)

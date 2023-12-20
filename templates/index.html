@@ -80,7 +80,7 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="createProjectModalLabel">Neues Projekt erstellen</h5>
+                                <h5 class="modal-title" id="createProjectModalLabel">Create new project</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -93,7 +93,7 @@
 
                                     </div>
                                     <div class="form-group">
-                                        <label for="projectDescription">Beschreibung</label>
+                                        <label for="projectDescription">Description</label>
                                         <textarea class="form-control" id="projectDescription" required></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Erstellen</button>
@@ -356,6 +356,7 @@
                                     <th>End Time</th>
                                     <th>Description</th>
                                     <th>Project</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <!-- Tabellenkörper -->
@@ -366,7 +367,11 @@
                                     <td>{{ incident.end_time.strftime('%H:%M %d.%m.%Y') }}</td>
                                     <td>{{ incident.description }}</td>
                                     <td>{{ incident.projekt.name }}</td>
-
+                                    <td class="text-center">
+                                        <a href="{{ url_for('edit_mttr', incident_id=incident.id) }}">
+                                            <i class="fas fa-cog"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
